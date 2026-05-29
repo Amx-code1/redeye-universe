@@ -7,17 +7,21 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
 
   const signIn = async () => {
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-    });
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo:
+        "https://redeye-universe.vercel.app/auth/callback",
+    },
+  });
 
-    if (error) {
-      alert(error.message);
-      return;
-    }
+  if (error) {
+    alert(error.message);
+    return;
+  }
 
-    alert("Check your email for the login link.");
-  };
+  alert("Check your email for the login link.");
+};
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-black text-white">
