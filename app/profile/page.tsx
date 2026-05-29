@@ -1,23 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function ProfilePage() {
-  const [email, setEmail] = useState("");
-
   useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    async function test() {
+      const { data: sessionData } =
+        await supabase.auth.getSession();
 
-      if (user) {
-        setEmail(user.email || "");
-      }
-    };
+      const { data: userData } =
+        await supabase.auth.getUser();
 
-    getUser();
+      console.log("SESSION", sessionData);
+      console.log("USER", userData);
+    }
+
+    test();
   }, []);
 
   return (
@@ -25,9 +24,8 @@ export default function ProfilePage() {
       <h1 className="text-5xl font-bold text-red-500">
         Profile
       </h1>
-
       <p className="mt-6">
-        Logged in as: {email}
+        Open browser console (F12)
       </p>
     </main>
   );
