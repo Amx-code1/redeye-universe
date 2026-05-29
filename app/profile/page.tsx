@@ -5,37 +5,37 @@ import { supabase } from "@/lib/supabase";
 
 export default function ProfilePage() {
   const [email, setEmail] = useState("Loading...");
-  const [userId, setUserId] = useState("");
 
   useEffect(() => {
     async function loadUser() {
-      console.log("PROFILE PAGE LOADED");
-
-      const {
-        data: { session },
-        error: sessionError,
-      } = await supabase.auth.getSession();
-
-      console.log("SESSION:", session);
-      console.log("SESSION ERROR:", sessionError);
-
       const {
         data: { user },
-        error: userError,
       } = await supabase.auth.getUser();
 
-      console.log("USER:", user);
-      console.log("USER ERROR:", userError);
-
       if (user) {
-        setEmail(user.email || "No email");
-        setUserId(user.id);
+        setEmail(user.email || "");
       } else {
         setEmail("Not logged in");
       }
     }
 
     loadUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        console.log("AUTH EVENT", _event);
+
+        if (session?.user) {
+          setEmail(session.user.email || "");
+        }
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
@@ -44,23 +44,9 @@ export default function ProfilePage() {
         Profile
       </h1>
 
-      <div className="max-w-2xl rounded-2xl border border-red-900/30 bg-zinc-900 p-8">
-        <h2 className="mb-4 text-2xl font-semibold">
-          Account Information
-        </h2>
-
-        <p className="mb-2">
-          <span className="font-bold text-red-400">
-            Email:
-          </span>{" "}
-          {email}
-        </p>
-
-        <p>
-          <span className="font-bold text-red-400">
-            User ID:
-          </span>{" "}
-          {userId || "Not available"}
+      <div className="rounded-2xl bg-zinc-900 p-8">
+        <p className="text-xl">
+          Logged in as: {email}
         </p>
       </div>
     </main>

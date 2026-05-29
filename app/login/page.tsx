@@ -11,7 +11,7 @@ export default function LoginPage() {
     email,
     options: {
       emailRedirectTo:
-        "https://redeye-universe.vercel.app/auth/callback",
+        "https://redeye-universe.vercel.app/profile",
     },
   });
 
