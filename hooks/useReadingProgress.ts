@@ -27,11 +27,15 @@ export default function useReadingProgress(
 
       const { data, error } = await supabase
         .from("reading_progress")
-        .insert({
+        .upsert({
           user_id: user.id,
           chapter_id: chapterId,
           progress,
-        });
+        },
+      {
+      onConflict: "user_id,chapter_id",
+    }
+  );
 
       console.log("DATA:", data);
       console.log("ERROR:", error);
