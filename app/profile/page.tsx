@@ -4,39 +4,43 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function ProfilePage() {
-  const [email, setEmail] = useState("Loading...");
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
-    async function loadUser() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    loadProfile();
+  }, []);
 
-      if (user) {
-        setEmail(user.email || "");
-      } else {
-        setEmail("Not logged in");
-      }
+  async function loadProfile() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      window.location.href = "/login";
+      return;
     }
 
-    loadUser();
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        console.log("AUTH EVENT", _event);
+    if (!data) {
+      window.location.href =
+        "/profile/setup";
+      return;
+    }
 
-        if (session?.user) {
-          setEmail(session.user.email || "");
-        }
-      }
+    setProfile(data);
+  }
+
+  if (!profile)
+    return (
+      <main className="p-10 text-white bg-black">
+        Loading...
+      </main>
     );
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
 
   return (
     <main className="min-h-screen bg-black p-10 text-white">
@@ -45,8 +49,22 @@ export default function ProfilePage() {
       </h1>
 
       <div className="rounded-2xl bg-zinc-900 p-8">
-        <p className="text-xl">
-          Logged in as: {email}
+        <p>Name: {profile.full_name}</p>
+
+        <p>
+          Username: {profile.username}
+        </p>
+
+        <p>Age: {profile.age}</p>
+
+        <p>Gender: {profile.gender}</p>
+
+        <p>
+          Joined:
+          {" "}
+          {new Date(
+            profile.created_at
+          ).toLocaleDateString()}
         </p>
       </div>
     </main>
