@@ -26,7 +26,8 @@ export default function ReadingHistoryPage() {
         .eq("user_id", user.id)
         .order("updated_at", {
           ascending: false,
-        });
+        })
+        .limit(1);
 
       setHistory(data || []);
     }
