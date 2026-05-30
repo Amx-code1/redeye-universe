@@ -4,8 +4,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import AvatarUpload from "@/components/profile/AvatarUpload";
 
-export default function EditProfile() {
-  const [profile, setProfile] = useState<any>();
+export default function EditProfilePage() {
+  const [profile, setProfile] =
+    useState<any>(null);
+
+  const [saving, setSaving] =
+    useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -27,24 +31,39 @@ export default function EditProfile() {
     setProfile(data);
   }
 
-  async function save() {
-    const { error } = await supabase
-      .from("profiles")
-      .update(profile)
-      .eq("id", profile.id);
+  async function saveProfile() {
+    try {
+      setSaving(true);
 
-    if (error) {
-      alert(error.message);
-      return;
+      const { error } =
+        await supabase
+          .from("profiles")
+          .update({
+            full_name:
+              profile.full_name,
+            username:
+              profile.username,
+            bio: profile.bio,
+            avatar_url:
+              profile.avatar_url,
+          })
+          .eq("id", profile.id);
+
+      if (error) throw error;
+
+      alert("Profile Updated");
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setSaving(false);
     }
-
-    alert("Profile Updated");
   }
 
   if (!profile) return null;
 
   return (
     <main className="min-h-screen bg-black p-10 text-white">
+
       <h1 className="mb-8 text-5xl font-bold text-red-500">
         Edit Profile
       </h1>
@@ -54,13 +73,14 @@ export default function EditProfile() {
         {profile.avatar_url && (
           <img
             src={profile.avatar_url}
-            className="h-32 w-32 rounded-full"
+            alt=""
+            className="h-32 w-32 rounded-full object-cover"
           />
         )}
 
         <AvatarUpload
           userId={profile.user_id}
-          onUpload={(url) =>
+          onUploaded={(url) =>
             setProfile({
               ...profile,
               avatar_url: url,
@@ -73,7 +93,8 @@ export default function EditProfile() {
           onChange={(e) =>
             setProfile({
               ...profile,
-              full_name: e.target.value,
+              full_name:
+                e.target.value,
             })
           }
           className="w-full rounded-xl bg-zinc-900 p-4"
@@ -84,13 +105,15 @@ export default function EditProfile() {
           onChange={(e) =>
             setProfile({
               ...profile,
-              username: e.target.value,
+              username:
+                e.target.value,
             })
           }
           className="w-full rounded-xl bg-zinc-900 p-4"
         />
 
         <textarea
+          rows={5}
           value={profile.bio ?? ""}
           onChange={(e) =>
             setProfile({
@@ -99,14 +122,16 @@ export default function EditProfile() {
             })
           }
           className="w-full rounded-xl bg-zinc-900 p-4"
-          rows={5}
         />
 
         <button
-          onClick={save}
+          onClick={saveProfile}
+          disabled={saving}
           className="rounded-xl bg-red-600 px-6 py-3"
         >
-          Save Profile
+          {saving
+            ? "Saving..."
+            : "Save Profile"}
         </button>
 
       </div>
