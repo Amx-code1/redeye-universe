@@ -35,6 +35,12 @@ export default async function AdminChapters() {
             <p className="text-zinc-400">
               {chapter.title}
             </p>
+            <Link
+            href={`/admin/chapters/${chapter.id}`}
+            className="mt-4 inline-block rounded-lg bg-red-600 px-4 py-2"
+            >
+           Edit
+         </Link>
           </div>
         ))}
       </div>
