@@ -3,6 +3,8 @@ import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import ReadingProgress from "@/components/reader/ReadingProgress";
 import CommentSection from "@/components/comments/CommentSection";
+import ProgressSaver from "@/components/reader/ProgressSaver";
+
 
 export default async function ChapterPage({
   params,
@@ -44,6 +46,7 @@ export default async function ChapterPage({
   return (
     <>
     <ReadingProgress />
+    <ProgressSaver chapterId={chapter.id} />
 
     <main className="min-h-screen bg-black px-6 py-12 text-white">
       <div className="mx-auto max-w-4xl">
