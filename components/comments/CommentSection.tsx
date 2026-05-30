@@ -45,19 +45,40 @@ export default function CommentSection({
   }
 
   async function addComment() {
-    if (!user || !content.trim()) return;
+  if (!user) {
+    alert("No user found");
+    return;
+  }
 
-    await supabase.from("comments").insert({
+  if (!content.trim()) {
+    alert("Comment is empty");
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("comments")
+    .insert({
       chapter_id: chapterId,
       content,
       username: user.email,
       user_email: user.email,
       user_id: user.id,
-    });
+    })
+    .select();
 
-    setContent("");
-    loadComments();
+  console.log("USER", user);
+  console.log("CHAPTER ID", chapterId);
+  console.log("DATA", data);
+  console.log("ERROR", error);
+
+  if (error) {
+    alert(JSON.stringify(error, null, 2));
+    return;
   }
+
+  setContent("");
+  loadComments();
+}
 
   return (
     <div className="mt-16">
