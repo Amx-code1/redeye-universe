@@ -114,13 +114,7 @@ export default function EditProfile() {
               Upload an avatar that readers will see.
             </p>
 
-            {profile.avatar_url && (
-              <img
-                src={profile.avatar_url}
-                alt="Avatar"
-                className="mb-5 h-32 w-32 rounded-full border-4 border-red-500 object-cover"
-              />
-            )}
+            
 
             <AvatarUpload
             avatarUrl={profile.avatar_url || ""}
