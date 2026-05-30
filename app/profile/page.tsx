@@ -101,32 +101,53 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile Card */}
-      <div className="rounded-2xl bg-zinc-900 p-8">
+     <div className="rounded-2xl bg-zinc-900 p-8">
 
-        <p className="mb-2">
-          Name: {profile.full_name}
-        </p>
+  <div className="mb-6 flex items-center gap-6">
 
-        <p className="mb-2">
-          Username: {profile.username}
-        </p>
-
-        <p className="mb-2">
-          Age: {profile.age}
-        </p>
-
-        <p className="mb-2">
-          Gender: {profile.gender}
-        </p>
-
-        <p>
-          Joined{" "}
-          {new Date(
-            profile.created_at
-          ).toLocaleDateString()}
-        </p>
-
+    {profile.avatar_url ? (
+      <img
+        src={profile.avatar_url}
+        alt={profile.full_name}
+        className="h-28 w-28 rounded-full border-4 border-red-500 object-cover"
+      />
+    ) : (
+      <div className="flex h-28 w-28 items-center justify-center rounded-full border-4 border-red-500 bg-zinc-800 text-4xl">
+        👤
       </div>
+    )}
+
+    <div>
+      <h2 className="text-3xl font-bold">
+        {profile.full_name}
+      </h2>
+
+      <p className="text-zinc-400">
+        @{profile.username}
+      </p>
+    </div>
+
+  </div>
+
+  <div className="space-y-2 text-lg">
+    <p>Age: {profile.age}</p>
+    <p>Gender: {profile.gender}</p>
+
+    <p>
+      Joined{" "}
+      {new Date(
+        profile.created_at
+      ).toLocaleDateString()}
+    </p>
+
+    {profile.bio && (
+      <p className="mt-4 text-zinc-300">
+        {profile.bio}
+      </p>
+    )}
+  </div>
+
+</div>
 
       <div className="mt-8 space-y-8">
 
