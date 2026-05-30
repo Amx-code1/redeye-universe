@@ -1,3 +1,5 @@
+// 
+
 "use client";
 
 import { useEffect } from "react";
@@ -12,6 +14,8 @@ export default function useReadingProgress(
         data: { user },
       } = await supabase.auth.getUser();
 
+      console.log("USER:", user);
+
       if (!user) return;
 
       const progress = Math.floor(
@@ -21,13 +25,16 @@ export default function useReadingProgress(
           100
       );
 
-      await supabase
+      const { data, error } = await supabase
         .from("reading_progress")
-        .upsert({
+        .insert({
           user_id: user.id,
           chapter_id: chapterId,
           progress,
         });
+
+      console.log("DATA:", data);
+      console.log("ERROR:", error);
     }
 
     const interval = setInterval(
