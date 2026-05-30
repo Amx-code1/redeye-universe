@@ -31,6 +31,37 @@ export default function EditProfile() {
     setProfile(data);
   }
 
+  async function handleAvatarUpload(
+  file: File
+) {
+  const fileExt =
+    file.name.split(".").pop();
+
+  const fileName =
+    `${crypto.randomUUID()}.${fileExt}`;
+
+  const { error } =
+    await supabase.storage
+      .from("avatars")
+      .upload(fileName, file);
+
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage
+    .from("avatars")
+    .getPublicUrl(fileName);
+
+  setProfile({
+    ...profile,
+    avatar_url: publicUrl,
+  });
+}
+
   async function save() {
     setSaving(true);
 
@@ -92,13 +123,8 @@ export default function EditProfile() {
             )}
 
             <AvatarUpload
-              userId={profile.user_id}
-              onUpload={(url) =>
-                setProfile({
-                  ...profile,
-                  avatar_url: url,
-                })
-              }
+            avatarUrl={profile.avatar_url || ""}
+            onChange={handleAvatarUpload}
             />
           </div>
 
