@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import ReadingProgress from "@/components/reader/ReadingProgress";
+import CommentSection from "@/components/comments/CommentSection";
 
 export default async function ChapterPage({
   params,
@@ -69,7 +70,7 @@ export default async function ChapterPage({
         </div>
 
         {/* Navigation */}
-        <div className="mt-16 flex items-center justify-between border-t border-red-900/30 pt-10">
+                <div className="mt-16 flex items-center justify-between border-t border-red-900/30 pt-10">
 
           {previousChapter ? (
             <Link
@@ -101,6 +102,11 @@ export default async function ChapterPage({
           )}
 
         </div>
+
+        <CommentSection
+          chapterId={chapter.id}
+        />
+
       </div>
     </main>
     </>
