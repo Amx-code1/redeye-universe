@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import Skeleton from "@/components/ui/Skeleton";
 
 
 export default function ReadingHistoryPage() {
   const [history, setHistory] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadHistory() {
@@ -34,10 +36,25 @@ export default function ReadingHistoryPage() {
         .limit(50);
 
       setHistory(data || []);
+      setLoading(false);
     }
 
     loadHistory();
   }, []);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-black p-10">
+        <Skeleton className="mb-8 h-20 w-80" />
+
+        <div className="space-y-4">
+          <Skeleton className="h-28 w-full" />
+          <Skeleton className="h-28 w-full" />
+          <Skeleton className="h-28 w-full" />
+        </div>
+      </main>
+    );
+  }
 
   return (
     <ProtectedRoute>
