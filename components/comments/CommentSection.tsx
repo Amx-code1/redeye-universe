@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
 
 interface Comment {
   id: string;
@@ -10,19 +11,16 @@ interface Comment {
   created_at: string;
 }
 
-export default function CommentSection({
-  chapterId,
-}: {
-  chapterId: string;
-}) {
+export default function CommentSection({ chapterId }: { chapterId: string }) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [content, setContent] = useState("");
   const [user, setUser] = useState<any>(null);
+  const [commentCount, setCommentCount] = useState(0);
 
   useEffect(() => {
     loadComments();
     loadUser();
-  }, []);
+  }, [chapterId]);
 
   async function loadUser() {
     const {
@@ -42,57 +40,51 @@ export default function CommentSection({
       });
 
     setComments(data || []);
+    setCommentCount(data?.length || 0);
   }
 
   async function addComment() {
-  if (!user) {
-    alert("No user found");
-    return;
-  }
+    if (!user) {
+      toast.error("Please login first");
+      return;
+    }
 
-  if (!content.trim()) {
-    alert("Comment is empty");
-    return;
-  }
+    if (!content.trim()) {
+      toast.error("Comment cannot be empty");
+      return;
+    }
 
-  const { data, error } = await supabase
-    .from("comments")
-    .insert({
+    const { error } = await supabase.from("comments").insert({
       chapter_id: chapterId,
       content,
       username: user.email,
       user_email: user.email,
       user_id: user.id,
-    })
-    .select();
+    });
 
-  console.log("USER", user);
-  console.log("CHAPTER ID", chapterId);
-  console.log("DATA", data);
-  console.log("ERROR", error);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
 
-  if (error) {
-    alert(JSON.stringify(error, null, 2));
-    return;
+    setContent("");
+
+    await loadComments();
+
+    toast.success("Comment posted");
   }
-
-  setContent("");
-  loadComments();
-}
-
   return (
     <div className="mt-16">
       <h2 className="mb-6 text-3xl font-bold text-red-500">
         Comments
+        <span className="ml-2 text-zinc-400">({commentCount})</span>
       </h2>
 
       {user ? (
         <div className="mb-8">
           <textarea
             value={content}
-            onChange={(e) =>
-              setContent(e.target.value)
-            }
+            onChange={(e) => setContent(e.target.value)}
             placeholder="Write a comment..."
             className="w-full rounded-xl bg-zinc-900 p-4 text-white"
           />
@@ -105,24 +97,21 @@ export default function CommentSection({
           </button>
         </div>
       ) : (
-        <p className="text-zinc-400">
-          Login to comment.
-        </p>
+        <p className="text-zinc-400">Login to comment.</p>
+      )}
+
+      {comments.length === 0 && (
+        <div className="rounded-xl bg-zinc-900 p-6 text-center">
+          <p className="text-zinc-400">Be the first person to comment.</p>
+        </div>
       )}
 
       <div className="space-y-4">
         {comments.map((comment) => (
-          <div
-            key={comment.id}
-            className="rounded-xl bg-zinc-900 p-4"
-          >
-            <p className="font-bold text-red-400">
-              {comment.user_email}
-            </p>
+          <div key={comment.id} className="rounded-xl bg-zinc-900 p-4">
+            <p className="font-bold text-red-400">{comment.user_email}</p>
 
-            <p className="mt-2">
-              {comment.content}
-            </p>
+            <p className="mt-2">{comment.content}</p>
           </div>
         ))}
       </div>

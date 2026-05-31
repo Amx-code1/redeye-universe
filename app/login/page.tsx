@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
+
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -16,11 +18,11 @@ export default function LoginPage() {
   });
 
   if (error) {
-    alert(error.message);
+    toast.error(error.message);
     return;
   }
 
-  alert("Check your email for the login link.");
+  toast.success("Check your email for the login link.");
 };
 
   return (

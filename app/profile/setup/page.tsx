@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
+
 
 export default function ProfileSetup() {
   const [name, setName] = useState("");
@@ -27,10 +29,11 @@ export default function ProfileSetup() {
       });
 
     if (error) {
-      alert(error.message);
+      toast.error(error.message);
       return;
     }
 
+    toast.success("Profile created!");
     window.location.href = "/profile";
   }
 

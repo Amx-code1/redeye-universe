@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
+
+
 
 export default function NewCharacter() {
   const [name, setName] = useState("");
@@ -20,11 +23,11 @@ export default function NewCharacter() {
         });
 
     if (error) {
-      alert(error.message);
+      toast.error(error.message);
       return;
     }
 
-    alert("Character created");
+    toast.success("Character created");
   }
 
   return (

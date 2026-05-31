@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
+
 
 export default function NewChapter() {
   const [chapterNumber, setChapterNumber] =
@@ -24,11 +26,11 @@ export default function NewChapter() {
       });
 
     if (error) {
-      alert(error.message);
+      toast.error(error.message);
       return;
     }
 
-    alert("Chapter created!");
+    toast.success("Chapter created!");
   }
 
   return (

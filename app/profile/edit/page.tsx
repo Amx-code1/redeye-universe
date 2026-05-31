@@ -43,7 +43,7 @@ export default function EditProfile() {
       .upload(fileName, file);
 
     if (error) {
-      alert(error.message);
+      toast.error(error.message);
       return;
     }
 
@@ -75,7 +75,7 @@ export default function EditProfile() {
     toast.success("Removed From Library");
 
     if (error) {
-      alert(error.message);
+      toast.error(error.message);
       return;
     }
 
