@@ -2,37 +2,52 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function ProtectedRoute({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
+
   const [loading, setLoading] = useState(true);
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
-    check();
+    checkUser();
   }, []);
 
-  async function check() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  async function checkUser() {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    if (!user) {
-      window.location.href = "/login";
-      return;
+      if (!session) {
+        router.replace("/login");
+        return;
+      }
+
+      setAuthorized(true);
+    } catch (error) {
+      console.error(error);
+      router.replace("/login");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   if (loading) {
     return (
-      <div className="p-10 text-white">
+      <main className="min-h-screen bg-black p-10 text-white">
         Loading...
-      </div>
+      </main>
     );
+  }
+
+  if (!authorized) {
+    return null;
   }
 
   return <>{children}</>;
