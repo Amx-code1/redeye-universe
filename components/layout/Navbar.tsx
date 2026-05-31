@@ -38,42 +38,27 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-zinc-800 bg-black">
       <div className="mx-auto flex max-w-7xl items-center justify-between p-4">
-        <Link
-          href="/"
-          className="text-2xl font-bold text-red-500"
-        >
+        <Link href="/" className="text-2xl font-bold text-red-500">
           RED-EYE
         </Link>
 
         {/* Desktop Menu */}
         <div className="hidden items-center gap-6 md:flex">
-          <Link
-            href="/chapters"
-            className="hover:text-red-400"
-          >
+          <Link href="/chapters" className="hover:text-red-400">
             Chapters
           </Link>
 
-          <Link
-            href="/characters"
-            className="hover:text-red-400"
-          >
+          <Link href="/characters" className="hover:text-red-400">
             Characters
           </Link>
 
           {user ? (
             <>
-              <Link
-                href="/library"
-                className="hover:text-red-400"
-              >
+              <Link href="/library" className="hover:text-red-400">
                 Library
               </Link>
 
-              <Link
-                href="/profile"
-                className="hover:text-red-400"
-              >
+              <Link href="/profile" className="hover:text-red-400">
                 Profile
               </Link>
 
@@ -94,10 +79,10 @@ export default function Navbar() {
               </Link>
 
               <Link
-                href="/register"
+                href="/login"
                 className="rounded-lg bg-red-600 px-4 py-2 hover:bg-red-700"
               >
-                Register
+                Get Started
               </Link>
             </>
           )}
@@ -115,34 +100,21 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="flex flex-col gap-4 border-t border-zinc-800 bg-black p-4 md:hidden">
-
-          <Link
-            href="/chapters"
-            onClick={() => setMenuOpen(false)}
-          >
+          <Link href="/chapters" onClick={() => setMenuOpen(false)}>
             Chapters
           </Link>
 
-          <Link
-            href="/characters"
-            onClick={() => setMenuOpen(false)}
-          >
+          <Link href="/characters" onClick={() => setMenuOpen(false)}>
             Characters
           </Link>
 
           {user ? (
             <>
-              <Link
-                href="/library"
-                onClick={() => setMenuOpen(false)}
-              >
+              <Link href="/library" onClick={() => setMenuOpen(false)}>
                 Library
               </Link>
 
-              <Link
-                href="/profile"
-                onClick={() => setMenuOpen(false)}
-              >
+              <Link href="/profile" onClick={() => setMenuOpen(false)}>
                 Profile
               </Link>
 
