@@ -12,6 +12,8 @@ export default function CharacterEditor() {
   const id = params?.id as string;
 
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
   const [character, setCharacter] = useState<any>(null);
 
   useEffect(() => {
@@ -29,10 +31,6 @@ export default function CharacterEditor() {
       .eq("id", id)
       .single();
 
-    console.log("ID:", id);
-    console.log("DATA:", data);
-    console.log("ERROR:", error);
-
     if (error) {
       toast.error(error.message);
       setLoading(false);
@@ -44,6 +42,8 @@ export default function CharacterEditor() {
   }
 
   async function saveCharacter() {
+    setSaving(true);
+
     const { error } = await supabase
       .from("characters")
       .update({
@@ -52,8 +52,18 @@ export default function CharacterEditor() {
         description: character.description,
         faction: character.faction,
         danger_level: character.danger_level,
+
+        avatar_url: character.avatar_url,
+        rank: character.rank,
+        status: character.status,
+        age: character.age,
+        power_level: character.power_level,
+        quote: character.quote,
+        abilities: character.abilities,
       })
       .eq("id", id);
+
+    setSaving(false);
 
     if (error) {
       toast.error(error.message);
@@ -65,7 +75,7 @@ export default function CharacterEditor() {
 
   async function deleteCharacter() {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this character?"
+      "Delete this character permanently?"
     );
 
     if (!confirmed) return;
@@ -88,7 +98,7 @@ export default function CharacterEditor() {
   if (loading) {
     return (
       <main className="min-h-screen bg-black p-10 text-white">
-        <div className="animate-pulse">
+        <div className="animate-pulse text-xl">
           Loading Character...
         </div>
       </main>
@@ -98,7 +108,7 @@ export default function CharacterEditor() {
   if (!character) {
     return (
       <main className="min-h-screen bg-black p-10 text-white">
-        <h1 className="text-3xl font-bold text-red-500">
+        <h1 className="text-4xl font-bold text-red-500">
           Character Not Found
         </h1>
       </main>
@@ -107,7 +117,7 @@ export default function CharacterEditor() {
 
   return (
     <main className="min-h-screen bg-black p-10 text-white">
-      <h1 className="mb-8 text-4xl font-bold text-red-500">
+      <h1 className="mb-8 text-5xl font-bold text-red-500">
         Edit Character
       </h1>
 
@@ -121,7 +131,7 @@ export default function CharacterEditor() {
               name: e.target.value,
             })
           }
-          placeholder="Character Name"
+          placeholder="Name"
           className="w-full rounded-xl bg-zinc-900 p-4"
         />
 
@@ -133,7 +143,7 @@ export default function CharacterEditor() {
               title: e.target.value,
             })
           }
-          placeholder="Character Title"
+          placeholder="Title"
           className="w-full rounded-xl bg-zinc-900 p-4"
         />
 
@@ -145,8 +155,20 @@ export default function CharacterEditor() {
               description: e.target.value,
             })
           }
-          placeholder="Description"
-          className="h-48 w-full rounded-xl bg-zinc-900 p-4"
+          placeholder="Biography"
+          className="h-40 w-full rounded-xl bg-zinc-900 p-4"
+        />
+
+        <input
+          value={character.avatar_url ?? ""}
+          onChange={(e) =>
+            setCharacter({
+              ...character,
+              avatar_url: e.target.value,
+            })
+          }
+          placeholder="Avatar URL"
+          className="w-full rounded-xl bg-zinc-900 p-4"
         />
 
         <input
@@ -173,13 +195,87 @@ export default function CharacterEditor() {
           className="w-full rounded-xl bg-zinc-900 p-4"
         />
 
-        <div className="flex gap-4">
+        <input
+          value={character.rank ?? ""}
+          onChange={(e) =>
+            setCharacter({
+              ...character,
+              rank: e.target.value,
+            })
+          }
+          placeholder="Rank"
+          className="w-full rounded-xl bg-zinc-900 p-4"
+        />
+
+        <input
+          value={character.status ?? ""}
+          onChange={(e) =>
+            setCharacter({
+              ...character,
+              status: e.target.value,
+            })
+          }
+          placeholder="Status"
+          className="w-full rounded-xl bg-zinc-900 p-4"
+        />
+
+        <input
+          type="number"
+          value={character.age ?? ""}
+          onChange={(e) =>
+            setCharacter({
+              ...character,
+              age: e.target.value,
+            })
+          }
+          placeholder="Age"
+          className="w-full rounded-xl bg-zinc-900 p-4"
+        />
+
+        <input
+          value={character.power_level ?? ""}
+          onChange={(e) =>
+            setCharacter({
+              ...character,
+              power_level: e.target.value,
+            })
+          }
+          placeholder="Power Level"
+          className="w-full rounded-xl bg-zinc-900 p-4"
+        />
+
+        <textarea
+          value={character.quote ?? ""}
+          onChange={(e) =>
+            setCharacter({
+              ...character,
+              quote: e.target.value,
+            })
+          }
+          placeholder="Character Quote"
+          className="h-28 w-full rounded-xl bg-zinc-900 p-4"
+        />
+
+        <textarea
+          value={character.abilities ?? ""}
+          onChange={(e) =>
+            setCharacter({
+              ...character,
+              abilities: e.target.value,
+            })
+          }
+          placeholder="Abilities"
+          className="h-40 w-full rounded-xl bg-zinc-900 p-4"
+        />
+
+        <div className="flex gap-4 pt-4">
 
           <button
             onClick={saveCharacter}
-            className="rounded-xl bg-green-600 px-6 py-3 hover:bg-green-700"
+            disabled={saving}
+            className="rounded-xl bg-green-600 px-6 py-3 hover:bg-green-700 disabled:opacity-50"
           >
-            Save Character
+            {saving ? "Saving..." : "Save Character"}
           </button>
 
           <button
