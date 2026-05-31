@@ -3,24 +3,32 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
-
-
+import { useRouter } from "next/navigation";
 
 export default function NewCharacter() {
+  const router = useRouter();
+
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [faction, setFaction] = useState("");
+  const [dangerLevel, setDangerLevel] = useState("");
 
   async function createCharacter() {
-    const { error } =
-      await supabase
-        .from("characters")
-        .insert({
-          name,
-          title,
-          description: "",
-          danger_level: "",
-          faction: "",
-        });
+    if (!name.trim()) {
+      toast.error("Name required");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("characters")
+      .insert({
+        name,
+        title,
+        description,
+        faction,
+        danger_level: dangerLevel,
+      });
 
     if (error) {
       toast.error(error.message);
@@ -28,6 +36,8 @@ export default function NewCharacter() {
     }
 
     toast.success("Character created");
+
+    router.push("/admin/characters");
   }
 
   return (
@@ -36,30 +46,57 @@ export default function NewCharacter() {
         Add Character
       </h1>
 
-      <input
-        placeholder="Name"
-        value={name}
-        onChange={(e) =>
-          setName(e.target.value)
-        }
-        className="mb-4 block w-full rounded-xl bg-zinc-900 p-4"
-      />
+      <div className="space-y-4">
 
-      <input
-        placeholder="Title"
-        value={title}
-        onChange={(e) =>
-          setTitle(e.target.value)
-        }
-        className="mb-4 block w-full rounded-xl bg-zinc-900 p-4"
-      />
+        <input
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full rounded-xl bg-zinc-900 p-4"
+        />
 
-      <button
-        onClick={createCharacter}
-        className="rounded-xl bg-red-600 px-6 py-3"
-      >
-        Create Character
-      </button>
+        <input
+          placeholder="Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full rounded-xl bg-zinc-900 p-4"
+        />
+
+        <textarea
+          placeholder="Description"
+          value={description}
+          onChange={(e) =>
+            setDescription(e.target.value)
+          }
+          className="h-48 w-full rounded-xl bg-zinc-900 p-4"
+        />
+
+        <input
+          placeholder="Faction"
+          value={faction}
+          onChange={(e) =>
+            setFaction(e.target.value)
+          }
+          className="w-full rounded-xl bg-zinc-900 p-4"
+        />
+
+        <input
+          placeholder="Danger Level"
+          value={dangerLevel}
+          onChange={(e) =>
+            setDangerLevel(e.target.value)
+          }
+          className="w-full rounded-xl bg-zinc-900 p-4"
+        />
+
+        <button
+          onClick={createCharacter}
+          className="rounded-xl bg-red-600 px-6 py-3"
+        >
+          Create Character
+        </button>
+
+      </div>
     </main>
   );
 }
