@@ -34,6 +34,7 @@ export default function LibraryPage() {
       .order("created_at", {
         ascending: false,
       });
+    console.log("LIBRARY DATA:", data);
 
     setItems(data || []);
   }
