@@ -3,8 +3,15 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { isAdmin } from "@/lib/admin";
+import { redirect } from "next/navigation";
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  const admin = await isAdmin();
+
+  if (!admin) {
+    redirect("/");
+  }
   const [stats, setStats] = useState({
     users: 0,
     chapters: 0,
@@ -23,21 +30,13 @@ export default function AdminPage() {
       { count: comments },
       { count: library },
     ] = await Promise.all([
-      supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true }),
+      supabase.from("profiles").select("*", { count: "exact", head: true }),
 
-      supabase
-        .from("chapters")
-        .select("*", { count: "exact", head: true }),
+      supabase.from("chapters").select("*", { count: "exact", head: true }),
 
-      supabase
-        .from("comments")
-        .select("*", { count: "exact", head: true }),
+      supabase.from("comments").select("*", { count: "exact", head: true }),
 
-      supabase
-        .from("library")
-        .select("*", { count: "exact", head: true }),
+      supabase.from("library").select("*", { count: "exact", head: true }),
     ]);
 
     setStats({
@@ -50,9 +49,7 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen bg-black p-10 text-white">
-      <h1 className="mb-10 text-5xl font-bold text-red-500">
-        Admin Dashboard
-      </h1>
+      <h1 className="mb-10 text-5xl font-bold text-red-500">Admin Dashboard</h1>
 
       {/* Stats */}
 
@@ -70,61 +67,39 @@ export default function AdminPage() {
           href="/admin/characters"
           className="rounded-2xl border border-red-900/30 bg-zinc-900 p-8 hover:border-red-500"
         >
-          <h2 className="text-2xl font-bold">
-            Manage Characters
-          </h2>
+          <h2 className="text-2xl font-bold">Manage Characters</h2>
 
-          <p className="mt-2 text-zinc-400">
-            Add / Edit Characters
-          </p>
+          <p className="mt-2 text-zinc-400">Add / Edit Characters</p>
         </Link>
 
         <Link
           href="/admin/chapters"
           className="rounded-2xl border border-red-900/30 bg-zinc-900 p-8 hover:border-red-500"
         >
-          <h2 className="text-2xl font-bold">
-            Manage Chapters
-          </h2>
+          <h2 className="text-2xl font-bold">Manage Chapters</h2>
 
-          <p className="mt-2 text-zinc-400">
-            Add / Edit Chapters
-          </p>
+          <p className="mt-2 text-zinc-400">Add / Edit Chapters</p>
         </Link>
 
         <Link
           href="/admin/comments"
           className="rounded-2xl border border-red-900/30 bg-zinc-900 p-8 hover:border-red-500"
         >
-          <h2 className="text-2xl font-bold">
-            Comments
-          </h2>
+          <h2 className="text-2xl font-bold">Comments</h2>
 
-          <p className="mt-2 text-zinc-400">
-            Moderate Readers
-          </p>
+          <p className="mt-2 text-zinc-400">Moderate Readers</p>
         </Link>
       </div>
     </main>
   );
 }
 
-function StatCard({
-  title,
-  value,
-}: {
-  title: string;
-  value: number;
-}) {
+function StatCard({ title, value }: { title: string; value: number }) {
   return (
     <div className="rounded-2xl bg-zinc-900 p-6">
-      <h3 className="text-zinc-400">
-        {title}
-      </h3>
+      <h3 className="text-zinc-400">{title}</h3>
 
-      <p className="mt-2 text-4xl font-bold text-red-500">
-        {value}
-      </p>
+      <p className="mt-2 text-4xl font-bold text-red-500">{value}</p>
     </div>
   );
 }

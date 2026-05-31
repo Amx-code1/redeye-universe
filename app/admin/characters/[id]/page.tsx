@@ -56,7 +56,7 @@ export default function CharacterEditor() {
         avatar_url: character.avatar_url,
         rank: character.rank,
         status: character.status,
-        age: character.age,
+        age: Number(character.age) || null,
         power_level: character.power_level,
         quote: character.quote,
         abilities: character.abilities,
@@ -170,6 +170,14 @@ export default function CharacterEditor() {
           placeholder="Avatar URL"
           className="w-full rounded-xl bg-zinc-900 p-4"
         />
+
+        {character.avatar_url && (
+          <img
+            src={character.avatar_url}
+            alt={character.name}
+            className="h-64 w-64 rounded-2xl border border-red-500 object-cover"
+          />
+        )}
 
         <input
           value={character.faction ?? ""}

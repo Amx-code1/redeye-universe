@@ -1,7 +1,14 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { isAdmin } from "@/lib/admin";
+import { redirect } from "next/navigation";
 
 export default async function AdminCharacters() {
+  const admin = await isAdmin();
+
+  if (!admin) {
+    redirect("/");
+  }
   const { data: characters } = await supabase
     .from("characters")
     .select("*")
@@ -10,9 +17,7 @@ export default async function AdminCharacters() {
   return (
     <main className="min-h-screen bg-black p-10 text-white">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-4xl font-bold text-red-500">
-          Characters
-        </h1>
+        <h1 className="text-4xl font-bold text-red-500">Characters</h1>
 
         <Link
           href="/admin/characters/new"
@@ -23,9 +28,7 @@ export default async function AdminCharacters() {
       </div>
 
       {characters?.length === 0 && (
-        <div className="rounded-xl bg-zinc-900 p-8">
-          No characters found.
-        </div>
+        <div className="rounded-xl bg-zinc-900 p-8">No characters found.</div>
       )}
 
       <div className="space-y-4">
@@ -35,13 +38,9 @@ export default async function AdminCharacters() {
             className="flex items-center justify-between rounded-xl bg-zinc-900 p-6"
           >
             <div>
-              <h2 className="text-2xl font-bold">
-                {character.name}
-              </h2>
+              <h2 className="text-2xl font-bold">{character.name}</h2>
 
-              <p className="text-zinc-400">
-                {character.title}
-              </p>
+              <p className="text-zinc-400">{character.title}</p>
             </div>
 
             <div className="flex gap-3">
