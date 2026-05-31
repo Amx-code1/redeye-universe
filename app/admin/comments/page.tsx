@@ -1,12 +1,48 @@
-import { supabase } from "@/lib/supabase";
+"use client";
 
-export default async function AdminCommentsPage() {
-  const { data: comments } = await supabase
-    .from("comments")
-    .select("*")
-    .order("created_at", {
-      ascending: false,
-    });
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import toast from "react-hot-toast";
+
+export default function AdminCommentsPage() {
+  const [comments, setComments] = useState<any[]>([]);
+
+  useEffect(() => {
+    loadComments();
+  }, []);
+
+  async function loadComments() {
+    const { data } = await supabase
+      .from("comments")
+      .select("*")
+      .order("created_at", {
+        ascending: false,
+      });
+
+    setComments(data || []);
+  }
+
+  async function deleteComment(id: string) {
+    const confirmed = window.confirm(
+      "Delete this comment?"
+    );
+
+    if (!confirmed) return;
+
+    const { error } = await supabase
+      .from("comments")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    toast.success("Comment deleted");
+
+    loadComments();
+  }
 
   return (
     <main className="min-h-screen bg-black p-10 text-white">
@@ -15,18 +51,31 @@ export default async function AdminCommentsPage() {
       </h1>
 
       <div className="space-y-4">
-        {comments?.map((comment) => (
+        {comments.map((comment) => (
           <div
             key={comment.id}
             className="rounded-2xl bg-zinc-900 p-6"
           >
-            <p className="font-bold text-red-400">
-              {comment.username}
-            </p>
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="font-bold text-red-400">
+                  {comment.username}
+                </p>
 
-            <p className="mt-2">
-              {comment.content}
-            </p>
+                <p className="mt-3">
+                  {comment.content}
+                </p>
+              </div>
+
+              <button
+                onClick={() =>
+                  deleteComment(comment.id)
+                }
+                className="rounded-lg bg-red-600 px-4 py-2 hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         ))}
       </div>
