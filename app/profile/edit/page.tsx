@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import AvatarUpload from "@/components/profile/AvatarUpload";
+import toast from "react-hot-toast";
 
 export default function EditProfile() {
   const [profile, setProfile] = useState<any>(null);
@@ -31,39 +32,33 @@ export default function EditProfile() {
     setProfile(data);
   }
 
-  async function handleAvatarUpload(
-  file: File
-) {
-  const fileExt =
-    file.name.split(".").pop();
+  async function handleAvatarUpload(file: File) {
+    const fileExt = file.name.split(".").pop();
 
-  const fileName =
-    `${crypto.randomUUID()}.${fileExt}`;
+    const fileName = `${crypto.randomUUID()}.${fileExt}`;
 
-  const { error } =
-    await supabase.storage
+    const { error } = await supabase.storage
       .from("avatars")
       .upload(fileName, file);
 
-  if (error) {
-    alert(error.message);
-    return;
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("avatars").getPublicUrl(fileName);
+
+    setProfile({
+      ...profile,
+      avatar_url: publicUrl,
+    });
   }
-
-  const {
-    data: { publicUrl },
-  } = supabase.storage
-    .from("avatars")
-    .getPublicUrl(fileName);
-
-  setProfile({
-    ...profile,
-    avatar_url: publicUrl,
-  });
-}
 
   async function save() {
     setSaving(true);
+    toast.success("Added To Library");
 
     const { error } = await supabase
       .from("profiles")
@@ -76,58 +71,47 @@ export default function EditProfile() {
       .eq("id", profile.id);
 
     setSaving(false);
+    toast.success("Removed From Library");
 
     if (error) {
       alert(error.message);
       return;
     }
 
-    alert("Profile Updated");
+    toast.success("Profile Updated");
   }
 
   if (!profile) {
     return (
-      <main className="min-h-screen bg-black p-10 text-white">
-        Loading...
-      </main>
+      <main className="min-h-screen bg-black p-10 text-white">Loading...</main>
     );
   }
 
   return (
     <main className="min-h-screen bg-black p-10 text-white">
       <div className="mx-auto max-w-4xl">
-
-        <h1 className="mb-10 text-5xl font-bold text-red-500">
-          Edit Profile
-        </h1>
+        <h1 className="mb-10 text-5xl font-bold text-red-500">Edit Profile</h1>
 
         <div className="rounded-3xl border border-red-900/30 bg-zinc-900 p-8">
-
           {/* Avatar Section */}
 
           <div className="mb-8">
-            <h2 className="mb-3 text-xl font-semibold">
-              Profile Picture
-            </h2>
+            <h2 className="mb-3 text-xl font-semibold">Profile Picture</h2>
 
             <p className="mb-5 text-zinc-400">
               Upload an avatar that readers will see.
             </p>
 
-            
-
             <AvatarUpload
-            avatarUrl={profile.avatar_url || ""}
-            onChange={handleAvatarUpload}
+              avatarUrl={profile.avatar_url || ""}
+              onChange={handleAvatarUpload}
             />
           </div>
 
           {/* Full Name */}
 
           <div className="mb-6">
-            <label className="mb-2 block text-zinc-400">
-              Full Name
-            </label>
+            <label className="mb-2 block text-zinc-400">Full Name</label>
 
             <input
               value={profile.full_name ?? ""}
@@ -145,9 +129,7 @@ export default function EditProfile() {
           {/* Username */}
 
           <div className="mb-6">
-            <label className="mb-2 block text-zinc-400">
-              Username
-            </label>
+            <label className="mb-2 block text-zinc-400">Username</label>
 
             <input
               value={profile.username ?? ""}
@@ -165,9 +147,7 @@ export default function EditProfile() {
           {/* Bio */}
 
           <div className="mb-8">
-            <label className="mb-2 block text-zinc-400">
-              Bio
-            </label>
+            <label className="mb-2 block text-zinc-400">Bio</label>
 
             <textarea
               value={profile.bio ?? ""}
@@ -191,9 +171,7 @@ export default function EditProfile() {
           {/* Completion Preview */}
 
           <div className="mb-8 rounded-2xl bg-black p-5">
-            <h3 className="mb-3 text-lg font-semibold">
-              Profile Completion
-            </h3>
+            <h3 className="mb-3 text-lg font-semibold">Profile Completion</h3>
 
             <div className="h-3 overflow-hidden rounded-full bg-zinc-800">
               <div
@@ -219,11 +197,8 @@ export default function EditProfile() {
             disabled={saving}
             className="rounded-xl bg-red-600 px-8 py-4 font-semibold transition hover:bg-red-700 disabled:opacity-50"
           >
-            {saving
-              ? "Saving..."
-              : "Save Profile"}
+            {saving ? "Saving..." : "Save Profile"}
           </button>
-
         </div>
       </div>
     </main>
