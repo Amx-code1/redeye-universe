@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+
 
 export default function LibraryPage() {
   const [items, setItems] = useState<any[]>([]);
@@ -40,6 +42,7 @@ export default function LibraryPage() {
   }
 
   return (
+    <ProtectedRoute>
     <main className="min-h-screen bg-black p-10 text-white">
       <h1 className="mb-8 text-6xl font-bold text-red-500">My Library</h1>
 
@@ -65,5 +68,6 @@ export default function LibraryPage() {
         </div>
       )}
     </main>
+    </ProtectedRoute>
   );
 }

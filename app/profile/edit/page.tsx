@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import AvatarUpload from "@/components/profile/AvatarUpload";
 import toast from "react-hot-toast";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function EditProfile() {
   const [profile, setProfile] = useState<any>(null);
@@ -88,9 +89,10 @@ export default function EditProfile() {
   }
 
   return (
-    <main className="min-h-screen bg-black p-10 text-white">
-      <div className="mx-auto max-w-4xl">
-        <h1 className="mb-10 text-5xl font-bold text-red-500">Edit Profile</h1>
+    <ProtectedRoute>
+      <main className="min-h-screen bg-black p-10 text-white">
+        <div className="mx-auto max-w-4xl">
+          <h1 className="mb-10 text-5xl font-bold text-red-500">Edit Profile</h1>
 
         <div className="rounded-3xl border border-red-900/30 bg-zinc-900 p-8">
           {/* Avatar Section */}
@@ -202,5 +204,6 @@ export default function EditProfile() {
         </div>
       </div>
     </main>
+    </ProtectedRoute>
   );
 }

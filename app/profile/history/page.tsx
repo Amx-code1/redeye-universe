@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+
 
 export default function ReadingHistoryPage() {
   const [history, setHistory] = useState<any[]>([]);
@@ -38,6 +40,7 @@ export default function ReadingHistoryPage() {
   }, []);
 
   return (
+    <ProtectedRoute>
     <main className="min-h-screen bg-black p-10 text-white">
       <h1 className="mb-8 text-5xl font-bold text-red-500">Reading History</h1>
 
@@ -61,5 +64,6 @@ export default function ReadingHistoryPage() {
         )}
       </div>
     </main>
+    </ProtectedRoute>
   );
 }

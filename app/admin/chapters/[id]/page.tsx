@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useParams } from "next/navigation";
+import toast from "react-hot-toast";
+
 
 export default function EditChapterPage() {
   const params = useParams();
@@ -52,11 +54,11 @@ export default function EditChapterPage() {
       .eq("id", id);
 
     if (error) {
-      alert(error.message);
+      toast.error(error.message);;
       return;
     }
 
-    alert("Chapter updated!");
+    toast.success("Chapter updated!");
   }
 
   async function deleteChapter() {
@@ -72,11 +74,11 @@ export default function EditChapterPage() {
       .eq("id", id);
 
     if (error) {
-      alert(error.message);
+      toast.error(error.message);;
       return;
     }
 
-    alert("Chapter deleted!");
+    toast.success("Chapter deleted!");
 
     window.location.href =
       "/admin/chapters";

@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import ProfileCompletion from "@/components/profile/ProfileCompletion";
 import ReaderStats from "@/components/profile/ReaderStats";
 import ContinueReading from "@/components/profile/ContinueReading";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState<any>(null);
@@ -87,6 +88,7 @@ export default function ProfilePage() {
   const latestReading = progressData.length > 0 ? progressData[0] : null;
 
   return (
+    <ProtectedRoute>
     <main className="min-h-screen bg-black p-10 text-white">
       <div className="mb-8 flex items-center justify-between">
         <h1 className="text-5xl font-bold text-red-500">Profile</h1>
@@ -180,5 +182,6 @@ export default function ProfilePage() {
         </div>
       </div>
     </main>
+    </ProtectedRoute>
   );
 }
