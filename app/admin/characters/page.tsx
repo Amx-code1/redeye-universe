@@ -1,14 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { isAdmin } from "@/lib/admin";
-import { redirect } from "next/navigation";
 
 export default async function AdminCharacters() {
-  const admin = await isAdmin();
-
-  if (!admin) {
-    redirect("/");
-  }
   const { data: characters } = await supabase
     .from("characters")
     .select("*")

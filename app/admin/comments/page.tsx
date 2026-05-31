@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
-import { isAdmin } from "@/lib/admin";
-import { redirect } from "next/navigation";
+
 
 export default function AdminCommentsPage() {
   const [comments, setComments] = useState<any[]>([]);
@@ -14,11 +13,7 @@ export default function AdminCommentsPage() {
   }, []);
 
   async function loadComments() {
-    const admin = await isAdmin();
 
-    if (!admin) {
-      redirect("/");
-    }
     const { data } = await supabase
       .from("comments")
       .select("*")

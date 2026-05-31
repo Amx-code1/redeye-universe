@@ -4,8 +4,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { isAdmin } from "@/lib/admin";
-import { redirect } from "next/navigation";
+
 
 export default function NewCharacter() {
   const router = useRouter();
@@ -17,11 +16,6 @@ export default function NewCharacter() {
   const [dangerLevel, setDangerLevel] = useState("");
 
   async function createCharacter() {
-    const admin = await isAdmin();
-
-    if (!admin) {
-      redirect("/");
-    }
     if (!name.trim()) {
       toast.error("Name required");
       return;
