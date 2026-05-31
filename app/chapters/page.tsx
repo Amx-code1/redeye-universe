@@ -1,5 +1,12 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Chapters | Red-Eye",
+  description:
+    "Read every chapter of Red-Eye.",
+};
 
 export default async function ChaptersPage() {
   const { data: chapters } = await supabase

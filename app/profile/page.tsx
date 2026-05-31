@@ -17,6 +17,8 @@ export default function ProfilePage() {
 
   const [progressData, setProgressData] = useState<any[]>([]);
   const [savedCount, setSavedCount] = useState(0);
+  const [error, setError] = useState("");
+
   useEffect(() => {
     loadProfile();
   }, []);
@@ -38,7 +40,7 @@ export default function ProfilePage() {
       .single();
 
     if (!profileData) {
-      window.location.href = "/profile/setup";
+      setError("Profile not found.");
       return;
     }
 
@@ -78,6 +80,18 @@ export default function ProfilePage() {
       });
 
     setProgressData(progress || []);
+  }
+
+  if (error) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-black text-white">
+        <div className="rounded-2xl border border-red-500 bg-zinc-900 p-8">
+          <h2 className="text-2xl font-bold text-red-500">Error</h2>
+
+          <p className="mt-4 text-zinc-300">{error}</p>
+        </div>
+      </main>
+    );
   }
 
   if (!profile) {
@@ -154,15 +168,15 @@ export default function ProfilePage() {
           {/* Continue Reading */}
           {latestReading ? (
             <ContinueReading
-              chapterTitle={latestReading.chapters?.title}
-              chapterSlug={latestReading.chapters?.slug}
+              chapterTitle={latestReading.chapters?.title || "Unknown Chapter"}
+              chapterSlug={latestReading.chapters?.slug || ""}
               progress={latestReading.progress}
             />
           ) : (
             <div className="rounded-2xl bg-zinc-900 p-6">
               <h2 className="text-2xl font-bold">Continue Reading</h2>
 
-              <p className="mt-3 text-zinc-400">
+              <p className="mt-2 text-zinc-400">
                 Start reading a chapter to see progress here.
               </p>
             </div>

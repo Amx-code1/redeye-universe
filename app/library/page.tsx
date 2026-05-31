@@ -9,6 +9,8 @@ import Skeleton from "@/components/ui/Skeleton";
 export default function LibraryPage() {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
 
   useEffect(() => {
     loadLibrary();
@@ -21,7 +23,7 @@ export default function LibraryPage() {
 
     if (!user) return;
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("library")
       .select(
         `
@@ -37,11 +39,24 @@ export default function LibraryPage() {
       .order("created_at", {
         ascending: false,
       });
+    if (error) {
+      setError(error.message);
+      return;
+    }
     console.log("LIBRARY DATA:", data);
 
     setItems(data || []);
     setLoading(false);
   }
+  if (error) {
+  return (
+    <main className="min-h-screen bg-black p-10 text-white">
+      <div className="rounded-2xl border border-red-500 bg-zinc-900 p-8">
+        {error}
+      </div>
+    </main>
+  );
+}
   if (loading) {
     return (
       <main className="min-h-screen bg-black p-10">

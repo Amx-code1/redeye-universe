@@ -5,6 +5,31 @@ import ReadingProgress from "@/components/reader/ReadingProgress";
 import CommentSection from "@/components/comments/CommentSection";
 import ProgressSaver from "@/components/reader/ProgressSaver";
 import LibraryButton from "@/components/library/LibraryButton";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+
+  const { data: chapter } = await supabase
+    .from("chapters")
+    .select("title")
+    .eq("slug", slug)
+    .single();
+
+  return {
+    title: chapter?.title
+      ? `${chapter.title} | Red-Eye`
+      : "Chapter | Red-Eye",
+
+    description:
+      "Read the next chapter of Red-Eye.",
+  };
+}
+
 
 export default async function ChapterPage({
   params,

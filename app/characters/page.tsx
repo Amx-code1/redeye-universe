@@ -1,6 +1,12 @@
 import { supabase } from "@/lib/supabase";
 import CharacterCard from "@/components/character/CharacterCard";
+import type { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Characters | Red-Eye",
+  description:
+    "Explore every character in Red-Eye.",
+};
 export default async function CharactersPage() {
   const { data: characters } = await supabase
     .from("characters")
