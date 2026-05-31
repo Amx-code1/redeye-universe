@@ -23,16 +23,14 @@ export default function AdminCommentsPage() {
   }
 
   async function deleteComment(id: string) {
-    const confirmed = window.confirm(
-      "Delete this comment?"
-    );
+    const confirmed = window.confirm("Delete this comment?");
 
     if (!confirmed) return;
 
-    const { error } = await supabase
-      .from("comments")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("comments").delete().eq("id", id);
+
+    console.log("DELETE ERROR:", error);
+    console.log("COMMENT ID:", id);
 
     if (error) {
       toast.error(error.message);
@@ -52,25 +50,16 @@ export default function AdminCommentsPage() {
 
       <div className="space-y-4">
         {comments.map((comment) => (
-          <div
-            key={comment.id}
-            className="rounded-2xl bg-zinc-900 p-6"
-          >
+          <div key={comment.id} className="rounded-2xl bg-zinc-900 p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="font-bold text-red-400">
-                  {comment.username}
-                </p>
+                <p className="font-bold text-red-400">{comment.username}</p>
 
-                <p className="mt-3">
-                  {comment.content}
-                </p>
+                <p className="mt-3">{comment.content}</p>
               </div>
 
               <button
-                onClick={() =>
-                  deleteComment(comment.id)
-                }
+                onClick={() => deleteComment(comment.id)}
                 className="rounded-lg bg-red-600 px-4 py-2 hover:bg-red-700"
               >
                 Delete
