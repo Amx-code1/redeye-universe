@@ -58,6 +58,10 @@ export default function Navbar() {
                 Library
               </Link>
 
+              <Link href="/admin" className="hover:text-red-400">
+                Admin
+              </Link>
+
               <Link href="/profile" className="hover:text-red-400">
                 Profile
               </Link>
@@ -99,7 +103,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="flex flex-col gap-4 border-t border-zinc-800 bg-black p-4 md:hidden">
+        <div className="animate-in slide-in-from-top-2 flex flex-col gap-4 border-t border-zinc-800 bg-black p-4 md:hidden">
           <Link href="/chapters" onClick={() => setMenuOpen(false)}>
             Chapters
           </Link>
@@ -112,6 +116,10 @@ export default function Navbar() {
             <>
               <Link href="/library" onClick={() => setMenuOpen(false)}>
                 Library
+              </Link>
+
+              <Link href="/admin" onClick={() => setMenuOpen(false)}>
+                Admin
               </Link>
 
               <Link href="/profile" onClick={() => setMenuOpen(false)}>
@@ -136,11 +144,11 @@ export default function Navbar() {
               </Link>
 
               <Link
-                href="/register"
+                href="/login"
                 onClick={() => setMenuOpen(false)}
                 className="rounded-lg bg-red-600 px-4 py-2"
               >
-                Register
+                Get Started
               </Link>
             </>
           )}
