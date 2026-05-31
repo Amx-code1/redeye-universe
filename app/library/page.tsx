@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Skeleton from "@/components/ui/Skeleton";
+import toast from "react-hot-toast";
 
 export default function LibraryPage() {
   const [items, setItems] = useState<any[]>([]);
@@ -17,6 +18,8 @@ export default function LibraryPage() {
 
   async function loadLibrary() {
     try {
+      setLoading(true);
+
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -26,42 +29,76 @@ export default function LibraryPage() {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("library")
-        .select(
-          `
-    id,
-    chapter_id,
-    created_at,
-    chapters!library_chapter_id_fkey (
-      id,
-      title,
-      slug
-    )
-  `,
-        )
-        .eq("user_id", user.id)
-        .order("created_at", {
-          ascending: false,
-        });
+      const { data: libraryData, error: libraryError } =
+        await supabase
+          .from("library")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", {
+            ascending: false,
+          });
 
-      if (error) {
-        console.error("LIBRARY ERROR:", error);
-
-        setError(error.message);
+      if (libraryError) {
+        setError(libraryError.message);
+        setLoading(false);
         return;
       }
 
-      console.log("LIBRARY DATA:", data);
+      if (!libraryData?.length) {
+        setItems([]);
+        setLoading(false);
+        return;
+      }
 
-      setItems(data || []);
+      const chapterIds = libraryData.map(
+        (item) => item.chapter_id
+      );
+
+      const { data: chapters, error: chapterError } =
+        await supabase
+          .from("chapters")
+          .select("id,title,slug")
+          .in("id", chapterIds);
+
+      if (chapterError) {
+        setError(chapterError.message);
+        setLoading(false);
+        return;
+      }
+
+      const merged = libraryData.map((item) => ({
+        ...item,
+        chapter: chapters?.find(
+          (chapter) => chapter.id === item.chapter_id
+        ),
+      }));
+
+      setItems(merged);
     } catch (err: any) {
       console.error(err);
-
-      setError("Failed to load library.");
+      setError("Failed to load library");
+      toast.error("Failed to load library");
     } finally {
       setLoading(false);
     }
+  }
+
+  async function removeFromLibrary(id: string) {
+    const { error } = await supabase
+      .from("library")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    setItems((prev) =>
+      prev.filter((item) => item.id !== id)
+    );
+
+    toast.success("Removed from library");
   }
 
   if (loading) {
@@ -82,11 +119,7 @@ export default function LibraryPage() {
     return (
       <main className="min-h-screen bg-black p-10 text-white">
         <div className="rounded-2xl border border-red-500 bg-zinc-900 p-8">
-          <h2 className="mb-2 text-2xl font-bold text-red-500">
-            Error Loading Library
-          </h2>
-
-          <p>{error}</p>
+          {error}
         </div>
       </main>
     );
@@ -95,11 +128,15 @@ export default function LibraryPage() {
   return (
     <ProtectedRoute>
       <main className="min-h-screen bg-black p-10 text-white">
-        <h1 className="mb-8 text-6xl font-bold text-red-500">My Library</h1>
+        <h1 className="mb-8 text-6xl font-bold text-red-500">
+          My Library
+        </h1>
 
         {items.length === 0 ? (
           <div className="rounded-2xl bg-zinc-900 p-8">
-            <h2 className="text-2xl font-bold">Your Library Is Empty</h2>
+            <h2 className="text-2xl font-bold">
+              Your Library Is Empty
+            </h2>
 
             <p className="mt-2 text-zinc-400">
               Save chapters to access them later.
@@ -107,23 +144,31 @@ export default function LibraryPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {items.map((item) => {
-              if (!item.chapters) return null;
-
-              return (
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between rounded-2xl bg-zinc-900 p-6"
+              >
                 <Link
-                  key={item.id}
-                  href={`/chapters/${item.chapters.slug}`}
-                  className="block rounded-2xl bg-zinc-900 p-6 transition hover:bg-zinc-800"
+                  href={`/chapters/${item.chapter?.slug}`}
+                  className="flex-1"
                 >
-                  <h2 className="text-2xl font-bold">{item.chapters.title}</h2>
-
-                  <p className="mt-2 text-sm text-zinc-400">
-                    Continue Reading →
-                  </p>
+                  <h2 className="text-2xl font-bold">
+                    {item.chapter?.title ??
+                      "Unknown Chapter"}
+                  </h2>
                 </Link>
-              );
-            })}
+
+                <button
+                  onClick={() =>
+                    removeFromLibrary(item.id)
+                  }
+                  className="rounded-xl bg-red-600 px-4 py-2 hover:bg-red-700"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </main>
