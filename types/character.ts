@@ -3,14 +3,15 @@ export interface Character {
   name: string;
   title: string;
   description: string;
-  faction: string;
-  danger_level: string;
 
   avatar_url?: string;
   rank?: string;
   status?: string;
+  faction?: string;
   age?: number;
-  abilities?: string;
+  power_level?: number;
   quote?: string;
-  power_level?: string;
+  abilities?: string;
+
+  danger_level?: string;
 }
