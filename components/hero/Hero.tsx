@@ -2,19 +2,27 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import {
-  BookOpen,
-  Users,
-  Flame,
-} from "lucide-react";
+import { BookOpen, Users, Flame } from "lucide-react";
+import Eye from "./Eye";
+import SmokeBackground from "./SmokeBackground";
+import FloatingParticles from "./FloatingParticles";
 
 export default function Hero() {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black text-white">
+      <SmokeBackground />
+
+      <FloatingParticles />
+
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#991b1b_0%,#000000_70%)] opacity-80" />
+
+      <Eye />
+
+       
 
       {/* Background */}
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#991b1b_0%,#000000_70%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#991b1b_0%,#000000_70%)] opacity-80" />
 
       {/* Floating Aura */}
 
@@ -49,33 +57,6 @@ export default function Hero() {
           }}
         />
       ))}
-
-      {/* Eye */}
-
-      <motion.div
-        animate={{
-          opacity: [0.7, 1, 0.7],
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-        }}
-        className="absolute h-[280px] w-[560px] rounded-full border border-red-500/40"
-      />
-
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-        }}
-        className="absolute h-32 w-32 rounded-full bg-red-600 blur-xl"
-      />
-
-      <div className="absolute h-16 w-16 rounded-full bg-red-900" />
-
       {/* Hero Glow */}
 
       <motion.div
@@ -104,7 +85,6 @@ export default function Hero() {
       {/* Content */}
 
       <div className="relative z-10 mx-auto max-w-6xl px-6 text-center">
-
         <motion.h1
           initial={{
             opacity: 0,
@@ -146,8 +126,8 @@ export default function Hero() {
           }}
           className="mx-auto max-w-3xl text-xl text-zinc-300 md:text-2xl"
         >
-          There is a difference between being loved and being preserved.
-          The Agastha Crystals changed everything.
+          There is a difference between being loved and being preserved. The
+          Agastha Crystals changed everything.
         </motion.p>
 
         {/* Buttons */}
@@ -203,7 +183,6 @@ export default function Hero() {
         {/* Stats */}
 
         <div className="mt-24 grid gap-6 md:grid-cols-3">
-
           <motion.div
             whileHover={{
               y: -10,
@@ -213,13 +192,9 @@ export default function Hero() {
           >
             <BookOpen className="mx-auto mb-4 h-8 w-8 text-red-500" />
 
-            <div className="text-3xl font-bold">
-              50+
-            </div>
+            <div className="text-3xl font-bold">50+</div>
 
-            <div className="text-zinc-400">
-              Chapters
-            </div>
+            <div className="text-zinc-400">Chapters</div>
           </motion.div>
 
           <motion.div
@@ -231,13 +206,9 @@ export default function Hero() {
           >
             <Users className="mx-auto mb-4 h-8 w-8 text-red-500" />
 
-            <div className="text-3xl font-bold">
-              20+
-            </div>
+            <div className="text-3xl font-bold">20+</div>
 
-            <div className="text-zinc-400">
-              Characters
-            </div>
+            <div className="text-zinc-400">Characters</div>
           </motion.div>
 
           <motion.div
@@ -249,15 +220,10 @@ export default function Hero() {
           >
             <Flame className="mx-auto mb-4 h-8 w-8 text-red-500" />
 
-            <div className="text-3xl font-bold">
-              Endless
-            </div>
+            <div className="text-3xl font-bold">Endless</div>
 
-            <div className="text-zinc-400">
-              Mysteries
-            </div>
+            <div className="text-zinc-400">Mysteries</div>
           </motion.div>
-
         </div>
 
         {/* Lore Quote */}
@@ -272,11 +238,10 @@ export default function Hero() {
           className="mt-20"
         >
           <p className="mx-auto max-w-3xl text-xl italic text-zinc-400">
-            "When the Agastha Crystal awakens,
-            kingdoms kneel and history burns."
+            "When the Agastha Crystal awakens, kingdoms kneel and history
+            burns."
           </p>
         </motion.div>
-
       </div>
 
       {/* Scroll Indicator */}
