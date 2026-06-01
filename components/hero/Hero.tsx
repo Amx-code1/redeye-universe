@@ -16,6 +16,8 @@ export default function Hero() {
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#991b1b_0%,#000000_70%)]" />
 
+      {/* Floating Aura */}
+
       <motion.div
         animate={{
           scale: [1, 1.08, 1],
@@ -24,8 +26,29 @@ export default function Hero() {
           duration: 8,
           repeat: Infinity,
         }}
-        className="absolute h-[800px] w-[800px] rounded-full bg-red-600/10 blur-[180px]"
+        className="absolute h-[900px] w-[900px] rounded-full bg-red-600/10 blur-[200px]"
       />
+
+      {/* Floating Particles */}
+
+      {[...Array(25)].map((_, i) => (
+        <motion.div
+          key={i}
+          animate={{
+            y: [0, -120, 0],
+            opacity: [0.1, 1, 0.1],
+          }}
+          transition={{
+            duration: 10 + i,
+            repeat: Infinity,
+          }}
+          className="absolute h-2 w-2 rounded-full bg-red-500/30"
+          style={{
+            left: `${(i * 13) % 100}%`,
+            top: `${(i * 7) % 100}%`,
+          }}
+        />
+      ))}
 
       {/* Eye */}
 
@@ -53,6 +76,31 @@ export default function Hero() {
 
       <div className="absolute h-16 w-16 rounded-full bg-red-900" />
 
+      {/* Hero Glow */}
+
+      <motion.div
+        animate={{
+          scale: [1, 1.15, 1],
+        }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+        }}
+        className="
+          absolute
+          left-1/2
+          top-1/2
+          -z-10
+          h-[450px]
+          w-[450px]
+          -translate-x-1/2
+          -translate-y-1/2
+          rounded-full
+          bg-red-600/10
+          blur-[140px]
+        "
+      />
+
       {/* Content */}
 
       <div className="relative z-10 mx-auto max-w-6xl px-6 text-center">
@@ -69,7 +117,19 @@ export default function Hero() {
           transition={{
             duration: 1,
           }}
-          className="mb-6 text-7xl font-black tracking-[0.3em] md:text-9xl"
+          className="
+            mb-6
+            bg-gradient-to-r
+            from-red-400
+            via-red-500
+            to-red-700
+            bg-clip-text
+            text-7xl
+            font-black
+            tracking-[0.3em]
+            text-transparent
+            md:text-9xl
+          "
         >
           RED-EYE
         </motion.h1>
@@ -106,14 +166,35 @@ export default function Hero() {
         >
           <Link
             href="/chapters"
-            className="rounded-2xl bg-red-600 px-10 py-5 font-bold transition hover:bg-red-700"
+            className="
+              rounded-2xl
+              bg-red-600
+              px-10
+              py-5
+              font-bold
+              shadow-lg
+              shadow-red-500/30
+              transition-all
+              hover:scale-105
+              hover:bg-red-700
+            "
           >
             Start Reading
           </Link>
 
           <Link
             href="/characters"
-            className="rounded-2xl border border-red-500 px-10 py-5 font-bold transition hover:bg-red-500/10"
+            className="
+              rounded-2xl
+              border
+              border-red-500
+              px-10
+              py-5
+              font-bold
+              transition-all
+              hover:scale-105
+              hover:bg-red-500/10
+            "
           >
             Meet The Characters
           </Link>
@@ -123,7 +204,13 @@ export default function Hero() {
 
         <div className="mt-24 grid gap-6 md:grid-cols-3">
 
-          <div className="rounded-3xl border border-red-900/30 bg-zinc-900/60 p-6 backdrop-blur">
+          <motion.div
+            whileHover={{
+              y: -10,
+              scale: 1.03,
+            }}
+            className="rounded-3xl border border-red-900/30 bg-zinc-900/60 p-6 backdrop-blur"
+          >
             <BookOpen className="mx-auto mb-4 h-8 w-8 text-red-500" />
 
             <div className="text-3xl font-bold">
@@ -133,9 +220,15 @@ export default function Hero() {
             <div className="text-zinc-400">
               Chapters
             </div>
-          </div>
+          </motion.div>
 
-          <div className="rounded-3xl border border-red-900/30 bg-zinc-900/60 p-6 backdrop-blur">
+          <motion.div
+            whileHover={{
+              y: -10,
+              scale: 1.03,
+            }}
+            className="rounded-3xl border border-red-900/30 bg-zinc-900/60 p-6 backdrop-blur"
+          >
             <Users className="mx-auto mb-4 h-8 w-8 text-red-500" />
 
             <div className="text-3xl font-bold">
@@ -145,9 +238,15 @@ export default function Hero() {
             <div className="text-zinc-400">
               Characters
             </div>
-          </div>
+          </motion.div>
 
-          <div className="rounded-3xl border border-red-900/30 bg-zinc-900/60 p-6 backdrop-blur">
+          <motion.div
+            whileHover={{
+              y: -10,
+              scale: 1.03,
+            }}
+            className="rounded-3xl border border-red-900/30 bg-zinc-900/60 p-6 backdrop-blur"
+          >
             <Flame className="mx-auto mb-4 h-8 w-8 text-red-500" />
 
             <div className="text-3xl font-bold">
@@ -157,9 +256,26 @@ export default function Hero() {
             <div className="text-zinc-400">
               Mysteries
             </div>
-          </div>
+          </motion.div>
 
         </div>
+
+        {/* Lore Quote */}
+
+        <motion.div
+          initial={{
+            opacity: 0,
+          }}
+          whileInView={{
+            opacity: 1,
+          }}
+          className="mt-20"
+        >
+          <p className="mx-auto max-w-3xl text-xl italic text-zinc-400">
+            "When the Agastha Crystal awakens,
+            kingdoms kneel and history burns."
+          </p>
+        </motion.div>
 
       </div>
 

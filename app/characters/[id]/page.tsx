@@ -1,6 +1,12 @@
 import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import {
+  Crown,
+  ShieldAlert,
+  Sparkles,
+  Users,
+} from "lucide-react";
 
 export async function generateMetadata({
   params,
@@ -41,70 +47,87 @@ export default async function CharacterPage({
   }
 
   return (
-    <main className="min-h-screen bg-black p-10 text-white">
-      <div className="mx-auto max-w-6xl">
+    <main className="min-h-screen bg-black text-white">
 
-        {/* Header */}
+      {/* Hero Banner */}
 
-        <div className="grid gap-10 md:grid-cols-[300px_1fr]">
+      <section className="relative overflow-hidden border-b border-red-900/20">
 
-          {/* Character Portrait */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#991b1b_0%,#000000_70%)]" />
 
-          <div className="flex items-center justify-center rounded-3xl border border-red-900/30 bg-zinc-900 p-8">
+        <div className="relative mx-auto max-w-7xl px-6 py-20">
 
-            {character.image_url ? (
-              <img
-                src={character.image_url}
-                alt={character.name}
-                className="h-72 w-72 rounded-2xl object-cover"
-              />
-            ) : (
-              <div className="flex h-72 w-72 items-center justify-center rounded-2xl bg-zinc-800 text-8xl">
-                👤
+          <div className="grid gap-12 lg:grid-cols-[400px_1fr]">
+
+            {/* Portrait */}
+
+            <div className="relative">
+
+              {character.avatar_url ? (
+                <img
+                  src={character.avatar_url}
+                  alt={character.name}
+                  className="
+                    h-[500px]
+                    w-full
+                    rounded-3xl
+                    object-cover
+                    border
+                    border-red-900/30
+                  "
+                />
+              ) : (
+                <div
+                  className="
+                    flex
+                    h-[500px]
+                    items-center
+                    justify-center
+                    rounded-3xl
+                    bg-zinc-900
+                    text-9xl
+                  "
+                >
+                  👤
+                </div>
+              )}
+
+            </div>
+
+            {/* Character Info */}
+
+            <div className="flex flex-col justify-center">
+
+              <div className="mb-4 flex flex-wrap gap-3">
+
+                {character.rank && (
+                  <span className="flex items-center gap-2 rounded-full bg-yellow-950/50 px-4 py-2">
+                    <Crown size={16} />
+                    {character.rank}
+                  </span>
+                )}
+
+                {character.status && (
+                  <span className="rounded-full bg-green-950/50 px-4 py-2">
+                    {character.status}
+                  </span>
+                )}
+
               </div>
-            )}
 
-          </div>
+              <h1 className="text-6xl font-black text-red-500 md:text-7xl">
+                {character.name}
+              </h1>
 
-          {/* Character Info */}
+              <p className="mt-4 text-2xl text-zinc-400">
+                {character.title}
+              </p>
 
-          <div>
-
-            <h1 className="text-6xl font-bold text-red-500">
-              {character.name}
-            </h1>
-
-            <p className="mt-4 text-2xl text-zinc-400">
-              {character.title}
-            </p>
-
-            <div className="mt-8 grid gap-4 md:grid-cols-2">
-
-              <InfoCard
-                label="Faction"
-                value={character.faction || "Unknown"}
-              />
-
-              <InfoCard
-                label="Danger Level"
-                value={
-                  character.danger_level || "Unknown"
-                }
-              />
-
-              <InfoCard
-                label="Status"
-                value={
-                  character.status || "Active"
-                }
-              />
-
-              <InfoCard
-                label="Rank"
-                value={
-                  character.rank || "Unranked"
-                }
-              />
+              {character.quote && (
+                <blockquote className="mt-8 border-l-4 border-red-500 pl-6 text-xl italic text-zinc-300">
+                  "{character.quote}"
+                </blockquote>
+              )}
 
             </div>
 
@@ -112,11 +135,49 @@ export default async function CharacterPage({
 
         </div>
 
-        {/* Biography */}
+      </section>
 
-        <section className="mt-16 rounded-3xl bg-zinc-900 p-8">
+      {/* Stats */}
 
-          <h2 className="mb-6 text-3xl font-bold text-red-500">
+      <section className="mx-auto max-w-7xl px-6 py-16">
+
+        <div className="grid gap-6 md:grid-cols-4">
+
+          <StatCard
+            icon={<Users size={20} />}
+            label="Faction"
+            value={character.faction || "Unknown"}
+          />
+
+          <StatCard
+            icon={<ShieldAlert size={20} />}
+            label="Danger Level"
+            value={character.danger_level || "Unknown"}
+          />
+
+          <StatCard
+            icon={<Sparkles size={20} />}
+            label="Power Level"
+            value={character.power_level || "Unknown"}
+          />
+
+          <StatCard
+            icon={<Crown size={20} />}
+            label="Age"
+            value={character.age || "Unknown"}
+          />
+
+        </div>
+
+      </section>
+
+      {/* Biography */}
+
+      <section className="mx-auto max-w-7xl px-6">
+
+        <div className="rounded-3xl border border-red-900/20 bg-zinc-900 p-10">
+
+          <h2 className="mb-6 text-4xl font-bold text-red-500">
             Biography
           </h2>
 
@@ -124,29 +185,58 @@ export default async function CharacterPage({
             {character.description}
           </p>
 
-        </section>
+        </div>
 
-      </div>
+      </section>
+
+      {/* Abilities */}
+
+      {character.abilities && (
+        <section className="mx-auto max-w-7xl px-6 py-16">
+
+          <div className="rounded-3xl border border-red-900/20 bg-zinc-900 p-10">
+
+            <h2 className="mb-6 text-4xl font-bold text-red-500">
+              Abilities
+            </h2>
+
+            <p className="leading-8 text-zinc-300">
+              {character.abilities}
+            </p>
+
+          </div>
+
+        </section>
+      )}
+
     </main>
   );
 }
 
-function InfoCard({
+function StatCard({
+  icon,
   label,
   value,
 }: {
+  icon: React.ReactNode;
   label: string;
   value: string;
 }) {
   return (
-    <div className="rounded-2xl bg-zinc-900 p-5">
-      <p className="text-sm uppercase tracking-wider text-zinc-500">
-        {label}
-      </p>
+    <div className="rounded-3xl border border-red-900/20 bg-zinc-900 p-6">
 
-      <p className="mt-2 text-xl font-bold">
+      <div className="mb-4 text-red-500">
+        {icon}
+      </div>
+
+      <div className="text-sm uppercase tracking-widest text-zinc-500">
+        {label}
+      </div>
+
+      <div className="mt-2 text-2xl font-bold">
         {value}
-      </p>
+      </div>
+
     </div>
   );
 }

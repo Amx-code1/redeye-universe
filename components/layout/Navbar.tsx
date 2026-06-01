@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Menu, X, Search } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function Navbar() {
+  const pathname = usePathname();
+
   const [user, setUser] = useState<any>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -57,6 +61,19 @@ export default function Navbar() {
     window.location.href = "/";
   }
 
+  const navLink = (href: string, label: string) => (
+    <Link
+      href={href}
+      className={`transition duration-300 ${
+        pathname === href
+          ? "text-red-500"
+          : "text-zinc-300 hover:text-red-400"
+      }`}
+    >
+      {label}
+    </Link>
+  );
+
   return (
     <nav className="sticky top-0 z-50 border-b border-red-900/20 bg-black/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -65,50 +82,56 @@ export default function Navbar() {
 
         <Link
           href="/"
-          className="text-3xl font-black tracking-widest text-red-500 transition hover:text-red-400"
+          className="relative text-3xl font-black tracking-[0.2em] text-red-500 transition hover:text-red-400"
         >
           RED-EYE
+
+          <span
+            className="
+              absolute
+              -inset-2
+              -z-10
+              rounded-full
+              bg-red-600/20
+              blur-xl
+            "
+          />
         </Link>
 
-        {/* Desktop */}
+        {/* Desktop Navigation */}
 
         <div className="hidden items-center gap-8 md:flex">
 
-          <Link href="/chapters" className="hover:text-red-400">
-            Chapters
-          </Link>
+          {navLink("/chapters", "Chapters")}
+          {navLink("/characters", "Characters")}
+          {navLink("/search", "Search")}
 
-          <Link href="/characters" className="hover:text-red-400">
-            Characters
-          </Link>
-
-          <Link href="/search" className="hover:text-red-400">
-            Search
-          </Link>
-
-          <button className="text-zinc-400 hover:text-red-400">
+          <Link
+            href="/search"
+            className="text-zinc-400 transition hover:text-red-400"
+          >
             <Search size={18} />
-          </button>
+          </Link>
 
           {user ? (
             <>
-              <Link href="/library" className="hover:text-red-400">
-                Library
-              </Link>
+              {navLink("/library", "Library")}
+              {navLink("/profile", "Profile")}
 
-              <Link href="/profile" className="hover:text-red-400">
-                Profile
-              </Link>
-
-              {isAdmin && (
-                <Link href="/admin" className="hover:text-red-400">
-                  Admin
-                </Link>
-              )}
+              {isAdmin && navLink("/admin", "Admin")}
 
               <button
                 onClick={logout}
-                className="rounded-xl bg-red-600 px-5 py-2 font-semibold transition hover:bg-red-700"
+                className="
+                  rounded-xl
+                  bg-red-600
+                  px-5
+                  py-2
+                  font-semibold
+                  transition-all
+                  hover:scale-105
+                  hover:bg-red-700
+                "
               >
                 Logout
               </button>
@@ -117,22 +140,39 @@ export default function Navbar() {
             <>
               <Link
                 href="/login"
-                className="rounded-xl border border-zinc-700 px-5 py-2 hover:border-red-500"
+                className="
+                  rounded-xl
+                  border
+                  border-zinc-700
+                  px-5
+                  py-2
+                  transition
+                  hover:border-red-500
+                "
               >
                 Login
               </Link>
 
               <Link
                 href="/register"
-                className="rounded-xl bg-red-600 px-5 py-2 font-semibold hover:bg-red-700"
+                className="
+                  rounded-xl
+                  bg-red-600
+                  px-5
+                  py-2
+                  font-semibold
+                  transition-all
+                  hover:scale-105
+                  hover:bg-red-700
+                "
               >
-                Join The Universe
+                Begin The Journey
               </Link>
             </>
           )}
         </div>
 
-        {/* Mobile Button */}
+        {/* Mobile Menu Button */}
 
         <button
           onClick={() => setMenuOpen(!menuOpen)}
@@ -148,56 +188,91 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
 
-      {menuOpen && (
-        <div className="border-t border-red-900/20 bg-black/95 p-6 backdrop-blur-xl md:hidden">
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: -20,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            exit={{
+              opacity: 0,
+              y: -20,
+            }}
+            transition={{
+              duration: 0.25,
+            }}
+            className="
+              border-t
+              border-red-900/20
+              bg-black/95
+              p-6
+              backdrop-blur-xl
+              md:hidden
+            "
+          >
+            <div className="flex flex-col gap-4">
 
-          <div className="flex flex-col gap-4">
+              {navLink("/chapters", "Chapters")}
+              {navLink("/characters", "Characters")}
+              {navLink("/search", "Search")}
 
-            <Link href="/chapters">Chapters</Link>
+              {user ? (
+                <>
+                  {navLink("/library", "Library")}
+                  {navLink("/profile", "Profile")}
 
-            <Link href="/characters">Characters</Link>
+                  {isAdmin && navLink("/admin", "Admin")}
 
-            <Link href="/search">Search</Link>
-
-            {user ? (
-              <>
-                <Link href="/library">Library</Link>
-
-                <Link href="/profile">Profile</Link>
-
-                {isAdmin && (
-                  <Link href="/admin">
-                    Admin
+                  <button
+                    onClick={logout}
+                    className="
+                      rounded-xl
+                      bg-red-600
+                      px-4
+                      py-3
+                      text-left
+                    "
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="
+                      rounded-xl
+                      border
+                      border-zinc-700
+                      px-4
+                      py-3
+                    "
+                  >
+                    Login
                   </Link>
-                )}
 
-                <button
-                  onClick={logout}
-                  className="rounded-xl bg-red-600 px-4 py-3 text-left"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="rounded-xl border border-zinc-700 px-4 py-3"
-                >
-                  Login
-                </Link>
-
-                <Link
-                  href="/register"
-                  className="rounded-xl bg-red-600 px-4 py-3"
-                >
-                  Join The Universe
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+                  <Link
+                    href="/register"
+                    className="
+                      rounded-xl
+                      bg-red-600
+                      px-4
+                      py-3
+                    "
+                  >
+                    Begin The Journey
+                  </Link>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

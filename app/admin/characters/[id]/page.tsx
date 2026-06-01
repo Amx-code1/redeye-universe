@@ -22,6 +22,34 @@ export default function CharacterEditor() {
     }
   }, [id]);
 
+  async function uploadAvatar(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    const fileName = `${Date.now()}-${file.name}`;
+
+    const { error } = await supabase.storage
+      .from("character-images")
+      .upload(fileName, file);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("character-images").getPublicUrl(fileName);
+
+    setCharacter({
+      ...character,
+      avatar_url: publicUrl,
+    });
+
+    toast.success("Portrait uploaded");
+  }
+
   async function loadCharacter() {
     setLoading(true);
 
@@ -74,16 +102,11 @@ export default function CharacterEditor() {
   }
 
   async function deleteCharacter() {
-    const confirmed = window.confirm(
-      "Delete this character permanently?"
-    );
+    const confirmed = window.confirm("Delete this character permanently?");
 
     if (!confirmed) return;
 
-    const { error } = await supabase
-      .from("characters")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("characters").delete().eq("id", id);
 
     if (error) {
       toast.error(error.message);
@@ -98,9 +121,7 @@ export default function CharacterEditor() {
   if (loading) {
     return (
       <main className="min-h-screen bg-black p-10 text-white">
-        <div className="animate-pulse text-xl">
-          Loading Character...
-        </div>
+        <div className="animate-pulse text-xl">Loading Character...</div>
       </main>
     );
   }
@@ -108,21 +129,41 @@ export default function CharacterEditor() {
   if (!character) {
     return (
       <main className="min-h-screen bg-black p-10 text-white">
-        <h1 className="text-4xl font-bold text-red-500">
-          Character Not Found
-        </h1>
+        <h1 className="text-4xl font-bold text-red-500">Character Not Found</h1>
       </main>
     );
   }
 
   return (
     <main className="min-h-screen bg-black p-10 text-white">
-      <h1 className="mb-8 text-5xl font-bold text-red-500">
-        Edit Character
-      </h1>
+      <h1 className="mb-8 text-5xl font-bold text-red-500">Edit Character</h1>
+      <div>
+        <label className="mb-2 block text-zinc-400">Character Portrait</label>
 
+        <input
+          type="file"
+          accept="image/*"
+          onChange={uploadAvatar}
+          className="w-full rounded-xl bg-zinc-900 p-4"
+        />
+
+        {character.avatar_url && (
+          <img
+            src={character.avatar_url}
+            alt="Preview"
+            className="
+        mt-4
+        h-72
+        w-72
+        rounded-2xl
+        object-cover
+        border
+        border-red-500
+      "
+          />
+        )}
+      </div>
       <div className="space-y-4">
-
         <input
           value={character.name ?? ""}
           onChange={(e) =>
@@ -157,18 +198,6 @@ export default function CharacterEditor() {
           }
           placeholder="Biography"
           className="h-40 w-full rounded-xl bg-zinc-900 p-4"
-        />
-
-        <input
-          value={character.avatar_url ?? ""}
-          onChange={(e) =>
-            setCharacter({
-              ...character,
-              avatar_url: e.target.value,
-            })
-          }
-          placeholder="Avatar URL"
-          className="w-full rounded-xl bg-zinc-900 p-4"
         />
 
         {character.avatar_url && (
@@ -277,7 +306,6 @@ export default function CharacterEditor() {
         />
 
         <div className="flex gap-4 pt-4">
-
           <button
             onClick={saveCharacter}
             disabled={saving}
@@ -292,7 +320,6 @@ export default function CharacterEditor() {
           >
             Delete Character
           </button>
-
         </div>
       </div>
     </main>
