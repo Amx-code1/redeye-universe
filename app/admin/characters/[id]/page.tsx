@@ -69,36 +69,81 @@ export default function CharacterEditor() {
     setLoading(false);
   }
 
-  async function saveCharacter() {
-    setSaving(true);
+  // async function saveCharacter() {
+  //   setSaving(true);
 
-    const { error } = await supabase
-      .from("characters")
-      .update({
+  //   const { error } = await supabase
+  //     .from("characters")
+  //     .update({
+  //       name: character.name,
+  //       title: character.title,
+  //       description: character.description,
+  //       faction: character.faction,
+  //       danger_level: character.danger_level,
+
+  //       avatar_url: character.avatar_url,
+  //       rank: character.rank,
+  //       status: character.status,
+  //       age: Number(character.age) || null,
+  //       power_level: character.power_level,
+  //       quote: character.quote,
+  //       abilities: character.abilities,
+  //     })
+  //     .eq("id", id);
+
+  //   setSaving(false);
+
+  //   if (error) {
+  //     toast.error(error.message);
+  //     return;
+  //   }
+
+  //   toast.success("Character updated");
+  // }
+
+  async function saveCharacter() {
+    try {
+      setSaving(true);
+
+      console.log("START SAVE");
+
+      const payload = {
         name: character.name,
         title: character.title,
         description: character.description,
         faction: character.faction,
         danger_level: character.danger_level,
-
-        avatar_url: character.avatar_url,
         rank: character.rank,
         status: character.status,
-        age: Number(character.age) || null,
+        age: character.age,
         power_level: character.power_level,
         quote: character.quote,
         abilities: character.abilities,
-      })
-      .eq("id", id);
+        avatar_url: character.avatar_url,
+      };
 
-    setSaving(false);
+      console.log("PAYLOAD:", payload);
 
-    if (error) {
-      toast.error(error.message);
-      return;
+      const { data, error } = await supabase
+        .from("characters")
+        .update(payload)
+        .eq("id", id)
+        .select();
+
+      console.log("RESULT:", data);
+      console.log("ERROR:", error);
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      toast.success("Character updated");
+    } catch (err) {
+      console.error("SAVE FAILED:", err);
+    } finally {
+      setSaving(false);
     }
-
-    toast.success("Character updated");
   }
 
   async function deleteCharacter() {
@@ -199,14 +244,6 @@ export default function CharacterEditor() {
           placeholder="Biography"
           className="h-40 w-full rounded-xl bg-zinc-900 p-4"
         />
-
-        {character.avatar_url && (
-          <img
-            src={character.avatar_url}
-            alt={character.name}
-            className="h-64 w-64 rounded-2xl border border-red-500 object-cover"
-          />
-        )}
 
         <input
           value={character.faction ?? ""}
