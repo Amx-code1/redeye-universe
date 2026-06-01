@@ -11,14 +11,8 @@ export default function Hero() {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black text-white">
       <SmokeBackground />
-
-      <FloatingParticles />
-
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#991b1b_0%,#000000_70%)] opacity-80" />
-
       <Eye />
-
-       
+      <FloatingParticles /> 
 
       {/* Background */}
 
