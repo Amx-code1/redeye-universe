@@ -1,22 +1,28 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Cinzel } from "next/font/google";
+
 import "./globals.css";
+
 import Navbar from "@/components/layout/Navbar";
-import { Toaster } from "react-hot-toast";
 import Footer from "@/components/layout/Footer";
 
+import { Toaster } from "react-hot-toast";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const cinzel = Cinzel({
   subsets: ["latin"],
+  variable: "--font-cinzel",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://redeye-universe.vercel.app"),
+
   title: {
     default: "Red-Eye Universe",
     template: "%s | Red-Eye Universe",
@@ -28,6 +34,7 @@ export const metadata: Metadata = {
   keywords: [
     "Red-Eye",
     "Dark Fantasy",
+    "Fantasy Universe",
     "Web Novel",
     "Fantasy Novel",
     "Agastha Crystal",
@@ -40,7 +47,17 @@ export const metadata: Metadata = {
     title: "Red-Eye Universe",
     description:
       "A dark fantasy universe built around Agastha Crystals, rebellion, and forbidden power.",
+    url: "https://redeye-universe.vercel.app",
+    siteName: "Red-Eye Universe",
     type: "website",
+    locale: "en_US",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Red-Eye Universe",
+    description:
+      "Explore the dark fantasy world of Agastha Crystals and forbidden power.",
   },
 
   robots: {
@@ -51,21 +68,35 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${inter.variable} ${cinzel.variable}`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-screen flex-col bg-black text-white antialiased">
         <Navbar />
 
-        <Toaster position="top-right" />
+        <main className="flex-1">
+          {children}
+        </main>
 
-        {children}
         <Footer />
+
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: "#18181b",
+              color: "#fff",
+              border: "1px solid rgba(239,68,68,0.3)",
+            },
+          }}
+        />
       </body>
     </html>
   );

@@ -1,30 +1,76 @@
+import Link from "next/link";
 
-import Hero from "@/components/hero/Hero";
-import LatestChapters from "@/components/sections/LatestChapters";
-import FeaturedCharacters from "@/components/sections/FeaturedCharacters";
-import type { Metadata } from "next";
-import UniverseTimeline from "@/components/sections/UniverseTimeline";
-import WorldFactions from "@/components/sections/WorldFactions";
-import CrystalSystem from "@/components/sections/CrystalSystem";
-import CommunitySection from "@/components/sections/CommunitySection";
-
-
-export const metadata: Metadata = {
-  title: "Red-Eye Universe",
-  description:
-    "A dark fantasy universe built around Agastha Crystals, rebellion, and forbidden power.",
-};
-
-export default function Home() {
+export default function LandingPage() {
   return (
-    <>
-      <Hero />
-      <LatestChapters />
-      <FeaturedCharacters />
-      <UniverseTimeline />
-      <WorldFactions />
-      <CrystalSystem />
-      <CommunitySection />
-    </>
+    <main
+      className="
+      relative
+      flex
+      min-h-screen
+      items-center
+      justify-center
+      overflow-hidden
+      bg-black
+      text-white
+    "
+    >
+      {/* Background */}
+
+      <div
+        className="
+        absolute
+        inset-0
+        bg-[radial-gradient(circle_at_center,#7f1d1d_0%,#000000_70%)]
+      "
+      />
+
+      {/* Content */}
+
+      <div className="relative z-10 text-center">
+        <h1
+          className="
+          font-title
+          text-7xl
+          font-black
+          tracking-[0.4em]
+          text-red-500
+          md:text-9xl
+        "
+        >
+          RED-EYE
+        </h1>
+
+        <p
+          className="
+          mx-auto
+          mt-8
+          max-w-2xl
+          text-xl
+          text-zinc-300
+        "
+        >
+          Welcome to the world shaped by Agastha Crystals,
+          forbidden power, rebellion, and forgotten history.
+        </p>
+
+        <Link
+          href="/home"
+          className="
+          mt-10
+          inline-flex
+          rounded-2xl
+          bg-red-600
+          px-10
+          py-5
+          font-bold
+          transition
+          hover:scale-105
+          hover:bg-red-700
+        "
+        >
+          Enter Universe
+        </Link>
+      </div>
+    </main>
   );
 }

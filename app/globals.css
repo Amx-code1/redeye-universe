@@ -1,25 +1,205 @@
 @import "tailwindcss";
 
+/* ========================= */
+/* RED-EYE DESIGN SYSTEM */
+/* ========================= */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --red-primary: #ef4444;
+  --red-secondary: #991b1b;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --bg-primary: #050505;
+  --bg-card: #101014;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --border-primary: rgba(239, 68, 68, 0.15);
+
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
 }
 
 body {
-  background: #050505;
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(120,0,0,.18),
+      transparent 50%
+    ),
+    #050505;
+
   color: white;
+
+  overflow-x: hidden;
+}
+
+/* Card */
+
+.red-card {
+  background: #101014;
+
+  border: 1px solid rgba(239,68,68,.12);
+
+  border-radius: 24px;
+
+  transition: all .3s ease;
+}
+
+.red-card:hover {
+  border-color: rgba(239,68,68,.35);
+
+  transform: translateY(-2px);
+}
+
+/* Glow */
+
+.red-glow {
+  box-shadow:
+    0 0 30px rgba(239,68,68,.25);
+}
+
+/* Title */
+
+.section-title {
+  font-size: clamp(2rem,4vw,4rem);
+
+  font-weight: 900;
+
+  color: #ef4444;
+}
+
+/* Input */
+
+.red-input {
+  background: #0d0d10;
+
+  border: 1px solid rgba(239,68,68,.15);
+
+  border-radius: 16px;
+}
+
+.red-input:focus {
+  border-color: #ef4444;
+
+  outline: none;
+}
+
+/* Button */
+
+.red-btn {
+  background: #dc2626;
+
+  border-radius: 16px;
+
+  transition: .3s;
+}
+
+.red-btn:hover {
+  background: #b91c1c;
+
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   BASE
+======================================== */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+
+  font-family: var(--font-inter);
+
+  min-height: 100vh;
+
+  overflow-x: hidden;
+
+  text-rendering: optimizeLegibility;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========================================
+   TYPOGRAPHY
+======================================== */
+
+.font-title {
+  font-family: var(--font-cinzel);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-cinzel);
+}
+
+/* ========================================
+   SCROLLBAR
+======================================== */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #991b1b;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ef4444;
+}
+
+/* ========================================
+   SELECTION
+======================================== */
+
+::selection {
+  background: rgba(239, 68, 68, 0.3);
+  color: white;
+}
+
+/* ========================================
+   UTILITIES
+======================================== */
+
+.red-glow {
+  box-shadow: 0 0 40px rgba(239, 68, 68, 0.2);
+}
+
+.red-glow-lg {
+  box-shadow: 0 0 80px rgba(239, 68, 68, 0.3);
+}
+
+.card-premium {
+  background: rgba(24, 24, 27, 0.75);
+
+  backdrop-filter: blur(16px);
+
+  border: 1px solid rgba(127, 29, 29, 0.3);
+
+  border-radius: 24px;
+}
+
+.section-divider {
+  height: 1px;
+
+  width: 100%;
+
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(239, 68, 68, 0.4),
+    transparent
+  );
 }

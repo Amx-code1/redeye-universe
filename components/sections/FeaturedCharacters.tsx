@@ -1,134 +1,3 @@
-// "use client";
-
-// import { motion } from "framer-motion";
-// import Link from "next/link";
-// import {
-//   Crown,
-//   ShieldAlert,
-//   Sparkles,
-// } from "lucide-react";
-
-// const characters = [
-//   {
-//     name: "Viktor",
-//     role: "Leader of the Rebellion",
-//     danger: "Extreme",
-//     icon: Crown,
-//   },
-//   {
-//     name: "The First Witch",
-//     role: "Ancient Power",
-//     danger: "Unknown",
-//     icon: Sparkles,
-//   },
-//   {
-//     name: "Aether",
-//     role: "Crystal Bearer",
-//     danger: "High",
-//     icon: ShieldAlert,
-//   },
-// ];
-
-// export default function FeaturedCharacters() {
-//   return (
-//     <section className="relative overflow-hidden bg-black py-32 text-white">
-
-//       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#7f1d1d_0%,#000000_70%)] opacity-30" />
-
-//       <div className="relative mx-auto max-w-7xl px-6">
-
-//         <div className="mb-16 text-center">
-
-//           <h2 className="text-5xl font-black text-red-500">
-//             Featured Characters
-//           </h2>
-
-//           <p className="mx-auto mt-4 max-w-2xl text-lg text-zinc-400">
-//             Legends, monsters, rulers and rebels.
-//             Every soul in Red-Eye leaves a scar upon history.
-//           </p>
-
-//         </div>
-
-//         <div className="grid gap-8 md:grid-cols-3">
-
-//           {characters.map((character, index) => {
-//             const Icon = character.icon;
-
-//             return (
-//               <motion.div
-//                 key={character.name}
-//                 initial={{
-//                   opacity: 0,
-//                   y: 40,
-//                 }}
-//                 whileInView={{
-//                   opacity: 1,
-//                   y: 0,
-//                 }}
-//                 viewport={{
-//                   once: true,
-//                 }}
-//                 transition={{
-//                   delay: index * 0.2,
-//                 }}
-//                 className="group relative overflow-hidden rounded-3xl border border-red-900/30 bg-zinc-900/80 backdrop-blur"
-//               >
-
-//                 {/* Glow */}
-
-//                 <div className="absolute inset-0 bg-gradient-to-b from-red-900/10 to-transparent opacity-0 transition duration-500 group-hover:opacity-100" />
-
-//                 {/* Portrait */}
-
-//                 <div className="relative flex h-72 items-center justify-center overflow-hidden">
-
-//                   <div className="absolute h-56 w-56 rounded-full bg-red-600/20 blur-3xl transition group-hover:scale-125" />
-
-//                   <Icon className="relative z-10 h-24 w-24 text-red-500" />
-
-//                 </div>
-
-//                 {/* Content */}
-
-//                 <div className="p-6">
-
-//                   <h3 className="text-3xl font-bold">
-//                     {character.name}
-//                   </h3>
-
-//                   <p className="mt-2 text-zinc-400">
-//                     {character.role}
-//                   </p>
-
-//                   <div className="mt-6 flex items-center justify-between">
-
-//                     <span className="rounded-full bg-red-950 px-4 py-2 text-sm text-red-300">
-//                       Danger: {character.danger}
-//                     </span>
-
-//                     <Link
-//                       href="/characters"
-//                       className="text-red-400 hover:text-red-300"
-//                     >
-//                       View →
-//                     </Link>
-
-//                   </div>
-
-//                 </div>
-
-//               </motion.div>
-//             );
-//           })}
-
-//         </div>
-
-//       </div>
-//     </section>
-//   );
-// }
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -136,10 +5,18 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import {
+  Crown,
+  ShieldAlert,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
+
 import type { Character } from "@/types/character";
 
 export default function FeaturedCharacters() {
   const [characters, setCharacters] = useState<Character[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadCharacters();
@@ -149,120 +26,325 @@ export default function FeaturedCharacters() {
     const { data } = await supabase
       .from("characters")
       .select("*")
-      .limit(3);
+      .limit(4);
 
     setCharacters(data || []);
+    setLoading(false);
   }
 
   return (
-    <section className="relative overflow-hidden bg-black py-32 text-white">
+    <section className="relative overflow-hidden py-32">
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#7f1d1d_0%,#000000_70%)] opacity-20" />
+      {/* Background */}
 
-      <div className="relative mx-auto max-w-7xl px-6">
+      <div className="absolute inset-0 bg-black" />
+
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#7f1d1d_0%,transparent_65%)] opacity-20" />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-6">
+
+        {/* Header */}
 
         <div className="mb-16 text-center">
-          <h2 className="text-5xl font-black text-red-500">
+
+          <div
+            className="
+            inline-flex
+            items-center
+            gap-2
+            rounded-full
+            border
+            border-red-500/20
+            bg-red-950/20
+            px-4
+            py-2
+            text-sm
+            tracking-widest
+            text-red-400
+          "
+          >
+            <Sparkles size={14} />
+            LEGENDS OF THE REALM
+          </div>
+
+          <h2
+            className="
+            mt-6
+            text-5xl
+            font-black
+            text-white
+            md:text-7xl
+          "
+          >
             Featured Characters
           </h2>
 
-          <p className="mx-auto mt-4 max-w-2xl text-zinc-400">
-            Meet the legends shaping the future of the Red-Eye Universe.
+          <p className="mx-auto mt-6 max-w-3xl text-zinc-400">
+            Heroes, tyrants, crystal bearers and forgotten rulers.
           </p>
+
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        {/* Loading */}
 
-          {characters.map((character, index) => (
-            <motion.div
-              key={character.id}
-              initial={{
-                opacity: 0,
-                y: 40,
-              }}
-              whileInView={{
-                opacity: 1,
-                y: 0,
-              }}
-              viewport={{
-                once: true,
-              }}
-              transition={{
-                delay: index * 0.15,
-              }}
-            >
-              <Link href={`/characters/${character.id}`}>
+        {loading && (
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <div
+                key={i}
+                className="
+                h-[520px]
+                animate-pulse
+                rounded-3xl
+                bg-zinc-900
+              "
+              />
+            ))}
+          </div>
+        )}
 
-                <div className="group overflow-hidden rounded-3xl border border-red-900/30 bg-zinc-900 transition-all hover:-translate-y-2 hover:border-red-500">
+        {/* Character Cards */}
 
-                  {/* Character Image */}
+        {!loading && (
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
 
-                  <div className="relative h-80 overflow-hidden">
+            {characters.map((character, index) => (
+              <motion.div
+                key={character.id}
+                initial={{
+                  opacity: 0,
+                  y: 50,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                viewport={{
+                  once: true,
+                }}
+                transition={{
+                  delay: index * 0.08,
+                }}
+              >
+                <Link href={`/characters/${character.id}`}>
 
-                    {character.avatar_url ? (
-                      <Image
-                        src={character.avatar_url}
-                        alt={character.name}
-                        fill
-                        className="object-cover transition duration-700 group-hover:scale-110"
+                  <div
+                    className="
+                    group
+                    relative
+                    overflow-hidden
+                    rounded-[28px]
+                    border
+                    border-red-900/20
+                    bg-zinc-950
+                    transition-all
+                    duration-500
+                    hover:-translate-y-2
+                    hover:border-red-500/40
+                    hover:shadow-[0_0_60px_rgba(239,68,68,0.2)]
+                  "
+                  >
+
+                    {/* Image */}
+
+                    <div className="relative h-[420px] overflow-hidden">
+
+                      {character.avatar_url ? (
+                        <Image
+                          src={character.avatar_url}
+                          alt={character.name}
+                          fill
+                          className="
+                          object-cover
+                          transition
+                          duration-700
+                          group-hover:scale-110
+                        "
+                        />
+                      ) : (
+                        <div className="h-full w-full bg-zinc-900" />
+                      )}
+
+                      {/* Overlays */}
+
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+
+                      <div
+                        className="
+                        absolute
+                        inset-0
+                        opacity-0
+                        transition
+                        duration-500
+                        group-hover:opacity-100
+                        bg-gradient-to-t
+                        from-red-950/40
+                        to-transparent
+                      "
                       />
-                    ) : (
-                      <div className="flex h-full items-center justify-center bg-gradient-to-b from-red-900/20 to-black">
-                        <span className="text-6xl text-red-500">
-                          ?
-                        </span>
-                      </div>
-                    )}
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-
-                  </div>
-
-                  {/* Content */}
-
-                  <div className="p-6">
-
-                    <div className="mb-3 flex flex-wrap gap-2">
+                      {/* Rank */}
 
                       {character.rank && (
-                        <span className="rounded-full bg-red-950 px-3 py-1 text-xs text-red-300">
-                          {character.rank}
-                        </span>
+                        <div
+                          className="
+                          absolute
+                          left-4
+                          top-4
+                          flex
+                          items-center
+                          gap-2
+                          rounded-full
+                          border
+                          border-red-500/20
+                          bg-black/70
+                          px-3
+                          py-1
+                          backdrop-blur
+                        "
+                        >
+                          <Crown
+                            size={14}
+                            className="text-yellow-400"
+                          />
+
+                          <span className="text-xs">
+                            {character.rank}
+                          </span>
+                        </div>
                       )}
 
-                      {character.faction && (
-                        <span className="rounded-full bg-zinc-800 px-3 py-1 text-xs">
-                          {character.faction}
-                        </span>
-                      )}
+                      {/* Name */}
+
+                      <div className="absolute bottom-5 left-5 right-5">
+
+                        <h3
+                          className="
+                          text-3xl
+                          font-black
+                          text-white
+                        "
+                        >
+                          {character.name}
+                        </h3>
+
+                        <p className="mt-1 text-sm text-zinc-300">
+                          {character.title}
+                        </p>
+
+                      </div>
 
                     </div>
 
-                    <h3 className="text-3xl font-bold">
-                      {character.name}
-                    </h3>
+                    {/* Bottom Content */}
 
-                    <p className="mt-2 text-zinc-400">
-                      {character.title}
-                    </p>
+                    <div className="p-5">
 
-                    <div className="mt-4 inline-block rounded-full bg-red-950 px-3 py-1 text-sm text-red-300">
-                      Danger: {character.danger_level}
+                      <div className="flex flex-wrap gap-2">
+
+                        {character.faction && (
+                          <span
+                            className="
+                            rounded-full
+                            bg-zinc-800
+                            px-3
+                            py-1
+                            text-xs
+                          "
+                          >
+                            {character.faction}
+                          </span>
+                        )}
+
+                        {character.danger_level && (
+                          <span
+                            className="
+                            flex
+                            items-center
+                            gap-1
+                            rounded-full
+                            bg-red-950/40
+                            px-3
+                            py-1
+                            text-xs
+                            text-red-400
+                          "
+                          >
+                            <ShieldAlert size={12} />
+                            {character.danger_level}
+                          </span>
+                        )}
+
+                      </div>
+
+                      {character.quote && (
+                        <p
+                          className="
+                          mt-4
+                          line-clamp-2
+                          text-sm
+                          italic
+                          text-zinc-400
+                        "
+                        >
+                          "{character.quote}"
+                        </p>
+                      )}
+
+                      <div
+                        className="
+                        mt-5
+                        flex
+                        items-center
+                        gap-2
+                        text-red-400
+                        transition
+                        group-hover:translate-x-1
+                      "
+                      >
+                        View Profile
+
+                        <ArrowRight size={16} />
+                      </div>
+
                     </div>
-
-                    {character.quote && (
-                      <p className="mt-4 italic text-zinc-500">
-                        "{character.quote}"
-                      </p>
-                    )}
 
                   </div>
 
-                </div>
+                </Link>
+              </motion.div>
+            ))}
 
-              </Link>
-            </motion.div>
-          ))}
+          </div>
+        )}
+
+        {/* CTA */}
+
+        <div className="mt-16 text-center">
+
+          <Link
+            href="/characters"
+            className="
+            inline-flex
+            items-center
+            gap-2
+            rounded-2xl
+            border
+            border-red-500/30
+            bg-red-950/10
+            px-8
+            py-4
+            font-semibold
+            text-white
+            transition
+            hover:border-red-500
+            hover:bg-red-500/10
+          "
+          >
+            View All Characters
+
+            <ArrowRight size={18} />
+          </Link>
 
         </div>
 

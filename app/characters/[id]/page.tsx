@@ -1,12 +1,21 @@
-import { supabase } from "@/lib/supabase";
-import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
+import { notFound } from "next/navigation";
+import { supabase } from "@/lib/supabase";
+
 import {
   Crown,
   ShieldAlert,
   Sparkles,
   Users,
+  Quote,
+  Swords,
+  Shield,
+  Flame,
+  ArrowLeft,
 } from "lucide-react";
+
+import Link from "next/link";
 
 export async function generateMetadata({
   params,
@@ -22,10 +31,12 @@ export async function generateMetadata({
     .single();
 
   return {
-    title: character?.name || "Character",
+    title: character
+      ? `${character.name} | Red-Eye Universe`
+      : "Character | Red-Eye Universe",
     description:
       character?.title ||
-      "Character profile from Red-Eye Universe",
+      "Character profile from the Red-Eye Universe.",
   };
 }
 
@@ -48,195 +59,246 @@ export default async function CharacterPage({
 
   return (
     <main className="min-h-screen bg-black text-white">
-
-      {/* Hero Banner */}
+      {/* HERO */}
 
       <section className="relative overflow-hidden border-b border-red-900/20">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#7f1d1d_0%,#000000_75%)] opacity-40" />
 
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#991b1b_0%,#000000_70%)]" />
+        <div className="absolute left-1/2 top-0 h-[900px] w-[900px] -translate-x-1/2 rounded-full bg-red-600/10 blur-[220px]" />
 
         <div className="relative mx-auto max-w-7xl px-6 py-20">
+          <Link
+            href="/characters"
+            className="
+              mb-10
+              inline-flex
+              items-center
+              gap-2
+              rounded-xl
+              border
+              border-red-900/20
+              bg-zinc-950/70
+              px-4
+              py-2
+              text-zinc-400
+              transition
+              hover:border-red-500/30
+              hover:text-red-400
+            "
+          >
+            <ArrowLeft size={16} />
+            Back To Characters
+          </Link>
 
-          <div className="grid gap-12 lg:grid-cols-[400px_1fr]">
-
-            {/* Portrait */}
+          <div className="grid gap-16 lg:grid-cols-[420px_1fr]">
+            {/* CHARACTER IMAGE */}
 
             <div className="relative">
+              <div className="absolute -inset-4 rounded-[36px] bg-red-600/10 blur-3xl" />
 
               {character.avatar_url ? (
                 <img
                   src={character.avatar_url}
                   alt={character.name}
                   className="
-                    h-[500px]
+                    relative
+                    h-[650px]
                     w-full
-                    rounded-3xl
-                    object-cover
+                    rounded-[36px]
                     border
-                    border-red-900/30
+                    border-red-900/20
+                    object-cover
                   "
                 />
               ) : (
                 <div
                   className="
+                    relative
                     flex
-                    h-[500px]
+                    h-[650px]
                     items-center
                     justify-center
-                    rounded-3xl
-                    bg-zinc-900
-                    text-9xl
+                    rounded-[36px]
+                    border
+                    border-red-900/20
+                    bg-zinc-950
+                    text-[120px]
                   "
                 >
                   👤
                 </div>
               )}
-
             </div>
 
-            {/* Character Info */}
+            {/* CHARACTER INFO */}
 
             <div className="flex flex-col justify-center">
-
-              <div className="mb-4 flex flex-wrap gap-3">
-
+              <div className="mb-5 flex flex-wrap gap-3">
                 {character.rank && (
-                  <span className="flex items-center gap-2 rounded-full bg-yellow-950/50 px-4 py-2">
+                  <div className="flex items-center gap-2 rounded-full border border-yellow-500/20 bg-yellow-950/20 px-5 py-2">
                     <Crown size={16} />
                     {character.rank}
-                  </span>
+                  </div>
                 )}
 
                 {character.status && (
-                  <span className="rounded-full bg-green-950/50 px-4 py-2">
+                  <div className="rounded-full border border-green-500/20 bg-green-950/20 px-5 py-2">
                     {character.status}
-                  </span>
+                  </div>
                 )}
-
               </div>
 
-              <h1 className="text-6xl font-black text-red-500 md:text-7xl">
+              <div className="text-sm uppercase tracking-[0.35em] text-red-400">
+                Red-Eye Character Archive
+              </div>
+
+              <h1 className="mt-4 bg-gradient-to-r from-red-300 via-red-500 to-red-700 bg-clip-text text-6xl font-black text-transparent md:text-8xl">
                 {character.name}
               </h1>
 
-              <p className="mt-4 text-2xl text-zinc-400">
+              <p className="mt-5 text-2xl text-zinc-400">
                 {character.title}
               </p>
 
               {character.quote && (
-                <blockquote className="mt-8 border-l-4 border-red-500 pl-6 text-xl italic text-zinc-300">
-                  "{character.quote}"
-                </blockquote>
+                <div className="mt-10 rounded-3xl border border-red-900/20 bg-zinc-950/80 p-8 backdrop-blur-xl">
+                  <Quote className="mb-4 text-red-500" />
+
+                  <p className="text-xl italic leading-relaxed text-zinc-300">
+                    "{character.quote}"
+                  </p>
+                </div>
               )}
-
             </div>
-
           </div>
-
         </div>
-
       </section>
 
-      {/* Stats */}
+      {/* CHARACTER STATS */}
 
       <section className="mx-auto max-w-7xl px-6 py-16">
-
-        <div className="grid gap-6 md:grid-cols-4">
-
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           <StatCard
-            icon={<Users size={20} />}
-            label="Faction"
+            icon={<Users size={22} />}
+            title="Faction"
             value={character.faction || "Unknown"}
           />
 
           <StatCard
-            icon={<ShieldAlert size={20} />}
-            label="Danger Level"
+            icon={<ShieldAlert size={22} />}
+            title="Danger Level"
             value={character.danger_level || "Unknown"}
           />
 
           <StatCard
-            icon={<Sparkles size={20} />}
-            label="Power Level"
+            icon={<Sparkles size={22} />}
+            title="Power Level"
             value={character.power_level || "Unknown"}
           />
 
           <StatCard
-            icon={<Crown size={20} />}
-            label="Age"
-            value={character.age || "Unknown"}
+            icon={<Crown size={22} />}
+            title="Age"
+            value={String(character.age || "Unknown")}
           />
-
         </div>
-
       </section>
 
-      {/* Biography */}
+      {/* LORE SECTION */}
 
-      <section className="mx-auto max-w-7xl px-6">
+      <section className="mx-auto max-w-7xl px-6 pb-10">
+        <div className="grid gap-8 lg:grid-cols-3">
+          <div className="rounded-[32px] border border-red-900/20 bg-zinc-950/80 p-8 backdrop-blur-xl">
+            <div className="mb-4 flex items-center gap-3 text-red-500">
+              <Swords size={20} />
+              <span className="font-semibold">Combat Class</span>
+            </div>
 
-        <div className="rounded-3xl border border-red-900/20 bg-zinc-900 p-10">
+            <p className="text-zinc-300">
+              {character.rank || "Unknown"}
+            </p>
+          </div>
 
-          <h2 className="mb-6 text-4xl font-bold text-red-500">
+          <div className="rounded-[32px] border border-red-900/20 bg-zinc-950/80 p-8 backdrop-blur-xl">
+            <div className="mb-4 flex items-center gap-3 text-red-500">
+              <Shield size={20} />
+              <span className="font-semibold">Affiliation</span>
+            </div>
+
+            <p className="text-zinc-300">
+              {character.faction || "Unknown"}
+            </p>
+          </div>
+
+          <div className="rounded-[32px] border border-red-900/20 bg-zinc-950/80 p-8 backdrop-blur-xl">
+            <div className="mb-4 flex items-center gap-3 text-red-500">
+              <Flame size={20} />
+              <span className="font-semibold">Threat Level</span>
+            </div>
+
+            <p className="text-zinc-300">
+              {character.danger_level || "Unknown"}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* BIOGRAPHY */}
+
+      <section className="mx-auto max-w-7xl px-6 pb-10">
+        <div className="rounded-[32px] border border-red-900/20 bg-zinc-950/80 p-10 backdrop-blur-xl">
+          <h2 className="mb-8 text-4xl font-black text-red-500">
             Biography
           </h2>
 
-          <p className="whitespace-pre-wrap leading-8 text-zinc-300">
-            {character.description}
+          <p className="whitespace-pre-wrap text-lg leading-9 text-zinc-300">
+            {character.description ||
+              "No biography has been recorded yet."}
           </p>
-
         </div>
-
       </section>
 
-      {/* Abilities */}
+      {/* ABILITIES */}
 
       {character.abilities && (
-        <section className="mx-auto max-w-7xl px-6 py-16">
-
-          <div className="rounded-3xl border border-red-900/20 bg-zinc-900 p-10">
-
-            <h2 className="mb-6 text-4xl font-bold text-red-500">
-              Abilities
+        <section className="mx-auto max-w-7xl px-6 pb-24">
+          <div className="rounded-[32px] border border-red-900/20 bg-zinc-950/80 p-10 backdrop-blur-xl">
+            <h2 className="mb-8 text-4xl font-black text-red-500">
+              Abilities & Powers
             </h2>
 
-            <p className="leading-8 text-zinc-300">
+            <p className="whitespace-pre-wrap text-lg leading-9 text-zinc-300">
               {character.abilities}
             </p>
-
           </div>
-
         </section>
       )}
-
     </main>
   );
 }
 
 function StatCard({
   icon,
-  label,
+  title,
   value,
 }: {
-  icon: React.ReactNode;
-  label: string;
+  icon: ReactNode;
+  title: string;
   value: string;
 }) {
   return (
-    <div className="rounded-3xl border border-red-900/20 bg-zinc-900 p-6">
-
+    <div className="rounded-[28px] border border-red-900/20 bg-zinc-950/80 p-8 backdrop-blur-xl">
       <div className="mb-4 text-red-500">
         {icon}
       </div>
 
-      <div className="text-sm uppercase tracking-widest text-zinc-500">
-        {label}
+      <div className="text-xs uppercase tracking-[0.25em] text-zinc-500">
+        {title}
       </div>
 
-      <div className="mt-2 text-2xl font-bold">
+      <div className="mt-3 text-2xl font-bold">
         {value}
       </div>
-
     </div>
   );
 }

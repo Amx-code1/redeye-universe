@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 import ProfileCompletion from "@/components/profile/ProfileCompletion";
 import ReaderStats from "@/components/profile/ReaderStats";
@@ -10,13 +11,36 @@ import ContinueReading from "@/components/profile/ContinueReading";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Skeleton from "@/components/ui/Skeleton";
 
+import {
+  User,
+  BookOpen,
+  MessageCircle,
+  Bookmark,
+  Trophy,
+  PenSquare,
+  Sparkles,
+  Crown,
+} from "lucide-react";
+
+type Profile = {
+  user_id: string;
+  full_name: string;
+  username: string;
+  bio?: string;
+  avatar_url?: string;
+  age?: number;
+  gender?: string;
+  created_at: string;
+};
+
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<any>(null);
+  const router = useRouter();
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   const [commentsCount, setCommentsCount] = useState(0);
+  const [savedCount, setSavedCount] = useState(0);
 
   const [progressData, setProgressData] = useState<any[]>([]);
-  const [savedCount, setSavedCount] = useState(0);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -29,7 +53,7 @@ export default function ProfilePage() {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      window.location.href = "/login";
+      router.push("/login");
       return;
     }
 
@@ -40,8 +64,26 @@ export default function ProfilePage() {
       .single();
 
     if (!profileData) {
-      setError("Profile not found.");
-      return;
+      const username = user.email?.split("@")[0] || "user";
+
+      const { data: newProfile, error: createError } = await supabase
+        .from("profiles")
+        .insert({
+          user_id: user.id,
+          username,
+          role: "user",
+        })
+        .select()
+        .single();
+
+      if (createError || !newProfile) {
+        setError("Failed to create profile.");
+        return;
+      }
+
+      setProfile(newProfile);
+    } else {
+      setProfile(profileData);
     }
 
     setProfile(profileData);
@@ -67,12 +109,12 @@ export default function ProfilePage() {
       .from("reading_progress")
       .select(
         `
-        *,
-        chapters (
-          title,
-          slug
-        )
-      `,
+          *,
+          chapters (
+            title,
+            slug
+          )
+        `,
       )
       .eq("user_id", user.id)
       .order("updated_at", {
@@ -85,10 +127,10 @@ export default function ProfilePage() {
   if (error) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-black text-white">
-        <div className="rounded-2xl border border-red-500 bg-zinc-900 p-8">
-          <h2 className="text-2xl font-bold text-red-500">Error</h2>
+        <div className="rounded-3xl border border-red-500/30 bg-zinc-950 p-10">
+          <h2 className="text-3xl font-black text-red-500">Error</h2>
 
-          <p className="mt-4 text-zinc-300">{error}</p>
+          <p className="mt-4 text-zinc-400">{error}</p>
         </div>
       </main>
     );
@@ -97,9 +139,9 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <main className="min-h-screen bg-black p-10">
-        <Skeleton className="mb-8 h-16 w-72" />
-
         <Skeleton className="mb-8 h-80 w-full" />
+
+        <Skeleton className="mb-8 h-40 w-full" />
 
         <Skeleton className="mb-8 h-40 w-full" />
 
@@ -110,178 +152,295 @@ export default function ProfilePage() {
 
   const latestReading = progressData.length > 0 ? progressData[0] : null;
 
+  const completedChapters = progressData.filter((p) => p.progress >= 90).length;
+
+  const rank =
+    completedChapters >= 25
+      ? "Crimson Sovereign"
+      : completedChapters >= 10
+        ? "Crystal Bearer"
+        : completedChapters >= 3
+          ? "Awakened Reader"
+          : "Wanderer";
+
   return (
     <ProtectedRoute>
       <main className="min-h-screen bg-black text-white">
-        <div className="mx-auto max-w-7xl px-6 py-10">
-          {/* Hero Profile */}
+        {/* HERO */}
 
-          <section className="relative overflow-hidden rounded-3xl border border-red-900/20 bg-zinc-900 p-10">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#991b1b_0%,transparent_70%)] opacity-30" />
+        <section className="relative overflow-hidden border-b border-red-900/20">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#7f1d1d_0%,#000000_75%)] opacity-40" />
 
-            <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex items-center gap-8">
+          <div className="absolute left-1/2 top-0 h-[900px] w-[900px] -translate-x-1/2 rounded-full bg-red-600/10 blur-[220px]" />
+
+          <div className="relative mx-auto max-w-7xl px-6 py-20">
+            <div className="grid gap-10 lg:grid-cols-[220px_1fr]">
+              {/* AVATAR */}
+
+              <div className="flex justify-center lg:block">
                 {profile.avatar_url ? (
                   <img
                     src={profile.avatar_url}
                     alt={profile.full_name}
-                    className="h-36 w-36 rounded-full border-4 border-red-500 object-cover"
+                    className="
+                      h-52
+                      w-52
+                      rounded-full
+                      border-4
+                      border-red-500/40
+                      object-cover
+                      shadow-[0_0_50px_rgba(239,68,68,0.3)]
+                    "
                   />
                 ) : (
-                  <div className="flex h-36 w-36 items-center justify-center rounded-full border-4 border-red-500 bg-zinc-800 text-6xl">
-                    👤
+                  <div
+                    className="
+                      flex
+                      h-52
+                      w-52
+                      items-center
+                      justify-center
+                      rounded-full
+                      border-4
+                      border-red-500/40
+                      bg-zinc-900
+                    "
+                  >
+                    <User size={80} />
                   </div>
                 )}
+              </div>
 
-                <div>
-                  <div className="mb-3 inline-flex rounded-full bg-red-950/50 px-4 py-2 text-sm text-red-400">
-                    Crystal Bearer
-                  </div>
+              {/* INFO */}
 
-                  <h1 className="text-5xl font-black text-red-500">
-                    {profile.full_name}
-                  </h1>
+              <div>
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-950/20 px-4 py-2 text-sm text-red-400">
+                  <Crown size={14} />
+                  {rank}
+                </div>
 
-                  <p className="mt-2 text-zinc-400">@{profile.username}</p>
+                <h1 className="bg-gradient-to-r from-red-300 via-red-500 to-red-700 bg-clip-text text-5xl font-black text-transparent md:text-7xl">
+                  {profile.full_name}
+                </h1>
 
-                  <p className="mt-4 max-w-xl text-zinc-300">
-                    {profile.bio || "No biography added yet."}
+                <p className="mt-2 text-xl text-zinc-400">
+                  @{profile.username}
+                </p>
+
+                <p className="mt-6 max-w-3xl text-lg leading-8 text-zinc-300">
+                  {profile.bio || "No biography added yet."}
+                </p>
+
+                <div className="mt-8 flex flex-wrap gap-4 text-zinc-500">
+                  <span>Age: {profile.age || "Unknown"}</span>
+
+                  <span>Gender: {profile.gender || "Unknown"}</span>
+
+                  <span>
+                    Joined {new Date(profile.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+
+                <div className="mt-8">
+                  <Link
+                    href="/profile/edit"
+                    className="
+                      inline-flex
+                      items-center
+                      gap-2
+                      rounded-2xl
+                      bg-gradient-to-r
+                      from-red-600
+                      to-red-700
+                      px-6
+                      py-4
+                      font-semibold
+                      transition
+                      hover:scale-105
+                    "
+                  >
+                    <PenSquare size={18} />
+                    Edit Profile
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* QUICK STATS */}
+
+        <section className="mx-auto max-w-7xl px-6 py-12">
+          <div className="grid gap-6 md:grid-cols-4">
+            <PremiumStatCard
+              icon={<MessageCircle />}
+              title="Comments"
+              value={commentsCount}
+            />
+
+            <PremiumStatCard
+              icon={<Bookmark />}
+              title="Saved"
+              value={savedCount}
+            />
+
+            <PremiumStatCard
+              icon={<BookOpen />}
+              title="Reading"
+              value={progressData.length}
+            />
+
+            <PremiumStatCard
+              icon={<Trophy />}
+              title="Completed"
+              value={completedChapters}
+            />
+          </div>
+        </section>
+
+        {/* MAIN DASHBOARD */}
+
+        <section className="mx-auto max-w-7xl px-6 pb-20">
+          <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+            {/* LEFT */}
+
+            <div className="space-y-8">
+              <ProfileCompletion
+                avatar_url={profile.avatar_url}
+                bio={profile.bio}
+                age={profile.age}
+                gender={profile.gender}
+              />
+
+              {latestReading ? (
+                <ContinueReading
+                  chapterTitle={
+                    latestReading.chapters?.title || "Unknown Chapter"
+                  }
+                  chapterSlug={latestReading.chapters?.slug || ""}
+                  progress={latestReading.progress}
+                />
+              ) : (
+                <div className="rounded-3xl border border-red-900/20 bg-zinc-950/80 p-8">
+                  <h2 className="text-2xl font-bold">Continue Reading</h2>
+
+                  <p className="mt-3 text-zinc-500">
+                    Start reading your first chapter to track progress.
                   </p>
+                </div>
+              )}
 
-                  <div className="mt-4 flex flex-wrap gap-4 text-sm text-zinc-400">
-                    <span>Age: {profile.age || "Unknown"}</span>
-                    <span>Gender: {profile.gender || "Unknown"}</span>
-                    <span>
-                      Joined {new Date(profile.created_at).toLocaleDateString()}
-                    </span>
-                  </div>
+              <ReaderStats
+                chaptersRead={completedChapters}
+                commentsCount={commentsCount}
+                progressCount={progressData.length}
+                savedCount={savedCount}
+              />
+            </div>
+
+            {/* RIGHT */}
+
+            <div className="space-y-8">
+              <div className="rounded-3xl border border-red-900/20 bg-zinc-950/80 p-8">
+                <div className="mb-6 flex items-center gap-3">
+                  <Sparkles className="text-red-500" />
+
+                  <h2 className="text-2xl font-bold">Achievements</h2>
+                </div>
+
+                <div className="space-y-4">
+                  <Achievement
+                    title="First Steps"
+                    unlocked={progressData.length > 0}
+                  />
+
+                  <Achievement
+                    title="Commentator"
+                    unlocked={commentsCount > 0}
+                  />
+
+                  <Achievement title="Collector" unlocked={savedCount > 5} />
+
+                  <Achievement
+                    title="Veteran Reader"
+                    unlocked={completedChapters >= 10}
+                  />
                 </div>
               </div>
 
-              <Link
-                href="/profile/edit"
-                className="
-                rounded-2xl
-                bg-red-600
-                px-6
-                py-4
-                font-semibold
-                transition
-                hover:bg-red-700
-              "
-              >
-                Edit Profile
-              </Link>
-            </div>
-          </section>
+              <div className="rounded-3xl border border-red-900/20 bg-zinc-950/80 p-8">
+                <h2 className="mb-6 text-2xl font-bold">Quick Access</h2>
 
-          {/* Stats */}
+                <div className="flex flex-col gap-3">
+                  <Link
+                    href="/profile/history"
+                    className="
+                      rounded-xl
+                      bg-zinc-900
+                      px-5
+                      py-4
+                      transition
+                      hover:bg-zinc-800
+                    "
+                  >
+                    Reading History
+                  </Link>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-4">
-            <StatCard title="Comments" value={commentsCount} />
+                  <Link
+                    href="/library"
+                    className="
+                      rounded-xl
+                      bg-zinc-900
+                      px-5
+                      py-4
+                      transition
+                      hover:bg-zinc-800
+                    "
+                  >
+                    My Library
+                  </Link>
 
-            <StatCard title="Saved" value={savedCount} />
-
-            <StatCard title="Progress" value={progressData.length} />
-
-            <StatCard
-              title="Completed"
-              value={progressData.filter((p) => p.progress >= 90).length}
-            />
-          </div>
-
-          {/* Existing Components */}
-
-          <div className="mt-8 space-y-8">
-            <ProfileCompletion
-              avatar_url={profile.avatar_url}
-              bio={profile.bio}
-              age={profile.age}
-              gender={profile.gender}
-            />
-
-            {latestReading ? (
-              <ContinueReading
-                chapterTitle={
-                  latestReading.chapters?.title || "Unknown Chapter"
-                }
-                chapterSlug={latestReading.chapters?.slug || ""}
-                progress={latestReading.progress}
-              />
-            ) : (
-              <div className="rounded-2xl bg-zinc-900 p-6">
-                <h2 className="text-2xl font-bold">Continue Reading</h2>
-
-                <p className="mt-2 text-zinc-400">
-                  Start reading a chapter to see progress here.
-                </p>
-              </div>
-            )}
-
-            <ReaderStats
-              chaptersRead={progressData.filter((p) => p.progress >= 90).length}
-              commentsCount={commentsCount}
-              progressCount={progressData.length}
-              savedCount={savedCount}
-            />
-
-            {/* Achievements */}
-
-            <div className="rounded-3xl bg-zinc-900 p-8">
-              <h2 className="mb-6 text-3xl font-bold text-red-500">
-                Achievements
-              </h2>
-
-              <div className="grid gap-4 md:grid-cols-3">
-                <Achievement
-                  title="First Steps"
-                  unlocked={progressData.length > 0}
-                />
-
-                <Achievement title="Commentator" unlocked={commentsCount > 0} />
-
-                <Achievement title="Collector" unlocked={savedCount > 5} />
+                  <Link
+                    href="/chapters"
+                    className="
+                      rounded-xl
+                      bg-zinc-900
+                      px-5
+                      py-4
+                      transition
+                      hover:bg-zinc-800
+                    "
+                  >
+                    Explore Chapters
+                  </Link>
+                </div>
               </div>
             </div>
-
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/profile/history"
-                className="rounded-xl bg-zinc-800 px-5 py-3 hover:bg-zinc-700"
-              >
-                Reading History
-              </Link>
-
-              <Link
-                href="/library"
-                className="rounded-xl bg-zinc-800 px-5 py-3 hover:bg-zinc-700"
-              >
-                My Library
-              </Link>
-            </div>
           </div>
-        </div>
+        </section>
       </main>
     </ProtectedRoute>
   );
 }
 
-function StatCard({
+function PremiumStatCard({
+  icon,
   title,
   value,
 }: {
+  icon: React.ReactNode;
   title: string;
   value: number;
 }) {
   return (
-    <div className="rounded-3xl bg-zinc-900 p-6">
-      <p className="text-zinc-400">
-        {title}
-      </p>
+    <div className="rounded-3xl border border-red-900/20 bg-zinc-950/80 p-8 backdrop-blur-xl">
+      <div className="mb-4 text-red-500">{icon}</div>
 
-      <p className="mt-2 text-4xl font-bold text-red-500">
-        {value}
-      </p>
+      <div className="text-sm uppercase tracking-wider text-zinc-500">
+        {title}
+      </div>
+
+      <div className="mt-2 text-4xl font-black">{value}</div>
     </div>
   );
 }
@@ -298,17 +457,15 @@ function Achievement({
       className={`
         rounded-2xl
         border
-        p-5
+        p-4
         ${
           unlocked
-            ? "border-red-500 bg-red-950/20"
+            ? "border-red-500/40 bg-red-950/20"
             : "border-zinc-800 bg-zinc-900"
         }
       `}
     >
-      <div className="font-bold">
-        {title}
-      </div>
+      <div className="font-semibold">{title}</div>
 
       <div className="mt-2 text-sm text-zinc-400">
         {unlocked ? "Unlocked" : "Locked"}

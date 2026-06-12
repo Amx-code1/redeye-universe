@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
-  BookOpen,
   ArrowRight,
+  BookOpen,
   Clock3,
   Sparkles,
 } from "lucide-react";
@@ -16,10 +17,13 @@ interface Chapter {
   title: string;
   slug: string;
   chapter_number: number;
+  cover_image: string | null;
+  created_at: string;
 }
 
 export default function LatestChapters() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadChapters();
@@ -32,166 +36,279 @@ export default function LatestChapters() {
       .order("chapter_number", {
         ascending: false,
       })
-      .limit(3);
+      .limit(6);
 
     setChapters(data || []);
+    setLoading(false);
   }
 
   return (
-    <section className="relative overflow-hidden bg-black py-32 text-white">
+    <section className="relative py-32 overflow-hidden">
 
       {/* Background */}
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#991b1b_0%,#000000_70%)] opacity-20" />
+      <div className="absolute inset-0 bg-black" />
 
-      <div className="absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-red-600/10 blur-[150px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,#7f1d1d_0%,transparent_60%)] opacity-30" />
 
-      <div className="relative mx-auto max-w-7xl px-6">
+      <div className="relative z-10 mx-auto max-w-7xl px-6">
 
         {/* Header */}
 
-        <div className="mb-20 text-center">
+        <div className="mb-16 text-center">
 
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-red-900/30 bg-zinc-900/50 px-4 py-2 text-sm text-red-400">
+          <div
+            className="
+            inline-flex
+            items-center
+            gap-2
+            rounded-full
+            border
+            border-red-500/20
+            bg-red-950/20
+            px-4
+            py-2
+            text-sm
+            tracking-widest
+            text-red-400
+          "
+          >
             <Sparkles size={14} />
-            Latest Story Content
+            LATEST STORY CONTENT
           </div>
 
-          <h2 className="bg-gradient-to-r from-red-400 via-red-500 to-red-700 bg-clip-text text-5xl font-black text-transparent md:text-6xl">
+          <h2
+            className="
+            mt-6
+            font-title
+            text-5xl
+            font-black
+            text-white
+            md:text-7xl
+          "
+          >
             Latest Chapters
           </h2>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-zinc-400">
-            Continue your journey through the Red-Eye Universe and uncover
-            secrets hidden within the Agastha Crystals.
+          <p className="mx-auto mt-6 max-w-3xl text-zinc-400">
+            Continue your journey through the Red-Eye Universe.
           </p>
-
         </div>
+
+        {/* Loading */}
+
+        {loading && (
+          <div className="grid gap-8 md:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="
+                h-[420px]
+                animate-pulse
+                rounded-3xl
+                bg-zinc-900
+              "
+              />
+            ))}
+          </div>
+        )}
 
         {/* Cards */}
 
-        <div className="grid gap-8 md:grid-cols-3">
+        {!loading && (
+          <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
 
-          {chapters.map((chapter, index) => (
-            <motion.div
-              key={chapter.id}
-              initial={{
-                opacity: 0,
-                y: 40,
-              }}
-              whileInView={{
-                opacity: 1,
-                y: 0,
-              }}
-              viewport={{
-                once: true,
-              }}
-              transition={{
-                delay: index * 0.15,
-              }}
-            >
-              <Link href={`/chapters/${chapter.slug}`}>
+            {chapters.map((chapter, index) => (
+              <motion.div
+                key={chapter.id}
+                initial={{
+                  opacity: 0,
+                  y: 40,
+                }}
+                whileInView={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                viewport={{
+                  once: true,
+                }}
+                transition={{
+                  delay: index * 0.08,
+                }}
+              >
+                <Link href={`/chapters/${chapter.slug}`}>
 
-                <div
-                  className="
+                  <div
+                    className="
                     group
-                    h-full
                     overflow-hidden
-                    rounded-3xl
+                    rounded-[28px]
                     border
                     border-red-900/20
-                    bg-zinc-900/80
-                    backdrop-blur
+                    bg-zinc-950
                     transition-all
                     duration-500
                     hover:-translate-y-2
-                    hover:border-red-500
-                    hover:shadow-[0_0_40px_rgba(239,68,68,0.15)]
+                    hover:border-red-500/40
+                    hover:shadow-[0_0_60px_rgba(239,68,68,0.18)]
                   "
-                >
+                  >
 
-                  {/* Top Bar */}
+                    {/* Cover */}
 
-                  <div className="h-2 bg-gradient-to-r from-red-500 via-red-700 to-red-900" />
+                    <div className="relative h-[260px] overflow-hidden">
 
-                  <div className="p-8">
+                      {chapter.cover_image ? (
+                        <Image
+                          src={chapter.cover_image}
+                          alt={chapter.title}
+                          fill
+                          className="
+                          object-cover
+                          transition
+                          duration-700
+                          group-hover:scale-110
+                        "
+                        />
+                      ) : (
+                        <div
+                          className="
+                          h-full
+                          w-full
+                          bg-[url('/world/castle.webp')]
+                          bg-cover
+                          bg-center
+                        "
+                        />
+                      )}
 
-                    <BookOpen className="mb-6 h-10 w-10 text-red-500" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
 
-                    <div className="mb-3 inline-flex rounded-full bg-red-950/40 px-3 py-1 text-xs uppercase tracking-widest text-red-400">
-                      Chapter {chapter.chapter_number}
+                      <div
+                        className="
+                        absolute
+                        left-5
+                        top-5
+                        rounded-full
+                        border
+                        border-red-500/30
+                        bg-black/70
+                        px-3
+                        py-1
+                        text-xs
+                        font-semibold
+                        text-red-400
+                        backdrop-blur
+                      "
+                      >
+                        Chapter {chapter.chapter_number}
+                      </div>
                     </div>
 
-                    <h3 className="text-3xl font-bold transition group-hover:text-red-400">
-                      {chapter.title}
-                    </h3>
+                    {/* Content */}
 
-                    <p className="mt-5 text-zinc-400">
-                      Continue the saga and discover new truths hidden
-                      within the ancient powers of the Agastha Crystals.
-                    </p>
+                    <div className="p-6">
 
-                    {/* Meta */}
+                      <h3
+                        className="
+                        line-clamp-2
+                        text-2xl
+                        font-bold
+                        text-white
+                        transition
+                        group-hover:text-red-400
+                      "
+                      >
+                        {chapter.title}
+                      </h3>
 
-                    <div className="mt-6 flex items-center gap-4 text-sm text-zinc-500">
+                      <p className="mt-4 line-clamp-3 text-zinc-400">
+                        The story continues deeper into the mysteries
+                        of the Agastha Crystals.
+                      </p>
 
-                      <div className="flex items-center gap-2">
-                        <Clock3 size={14} />
-                        5-10 min read
+                      <div
+                        className="
+                        mt-5
+                        flex
+                        items-center
+                        gap-4
+                        text-sm
+                        text-zinc-500
+                      "
+                      >
+                        <div className="flex items-center gap-2">
+                          <Clock3 size={14} />
+                          5–10 min read
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <BookOpen size={14} />
+                          New Chapter
+                        </div>
                       </div>
 
-                    </div>
+                      <div
+                        className="
+                        mt-6
+                        flex
+                        items-center
+                        gap-2
+                        font-semibold
+                        text-red-400
+                      "
+                      >
+                        Read Now
 
-                    {/* CTA */}
-
-                    <div className="mt-8 flex items-center gap-2 text-red-400 transition group-hover:translate-x-1">
-
-                      Read Chapter
-
-                      <ArrowRight size={18} />
-
+                        <ArrowRight
+                          size={18}
+                          className="
+                          transition
+                          group-hover:translate-x-1
+                        "
+                        />
+                      </div>
                     </div>
 
                   </div>
 
-                </div>
+                </Link>
+              </motion.div>
+            ))}
 
-              </Link>
-            </motion.div>
-          ))}
+          </div>
+        )}
 
-        </div>
-
-        {/* Bottom CTA */}
+        {/* CTA */}
 
         <div className="mt-16 text-center">
 
           <Link
             href="/chapters"
             className="
-              inline-flex
-              items-center
-              gap-2
-              rounded-2xl
-              border
-              border-red-500
-              px-8
-              py-4
-              font-semibold
-              transition-all
-              hover:scale-105
-              hover:bg-red-500/10
-            "
+            inline-flex
+            items-center
+            gap-2
+            rounded-2xl
+            border
+            border-red-500/30
+            bg-red-950/10
+            px-8
+            py-4
+            font-semibold
+            text-white
+            transition
+            hover:border-red-500
+            hover:bg-red-500/10
+          "
           >
             View All Chapters
-
             <ArrowRight size={18} />
           </Link>
 
         </div>
 
       </div>
-
     </section>
   );
 }
