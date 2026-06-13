@@ -1,124 +1,196 @@
-// import Link from "next/link";
-// import { supabase } from "@/lib/supabase";
+"use client";
 
-// export default async function AdminChapters() {
-//   const { data: chapters } = await supabase
-//     .from("chapters")
-//     .select("*")
-//     .order("chapter_number");
-
-//   return (
-//     <main className="min-h-screen bg-black p-10 text-white">
-//       <div className="mb-10 flex items-center justify-between">
-//         <h1 className="text-5xl font-bold text-red-500">
-//           Chapters
-//         </h1>
-
-//         <Link
-//           href="/admin/chapters/new"
-//           className="rounded-xl bg-red-600 px-6 py-3"
-//         >
-//           New Chapter
-//         </Link>
-//       </div>
-
-//       <div className="space-y-4">
-//         {chapters?.map((chapter) => (
-//           <div
-//             key={chapter.id}
-//             className="rounded-xl bg-zinc-900 p-6"
-//           >
-//             <h2 className="text-2xl font-bold">
-//               Chapter {chapter.chapter_number}
-//             </h2>
-
-//             <p className="text-zinc-400">
-//               {chapter.title}
-//             </p>
-//             <Link
-//             href={`/admin/chapters/${chapter.id}`}
-//             className="mt-4 inline-block rounded-lg bg-red-600 px-4 py-2"
-//             >
-//            Edit
-//          </Link>
-//           </div>
-//         ))}
-//       </div>
-//     </main>
-//   );
-// }
-
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import AdminRoute from "@/components/auth/AdminRoute";
+import toast from "react-hot-toast";
 
-export const dynamic = "force-dynamic";
+type Chapter = {
+  id: string;
+  chapter_number: number;
+  title: string;
+  slug: string;
+  created_at: string;
+  cover_image: string | null;
+};
 
-export default async function AdminChapters() {
-  const { data: chapters, error } = await supabase
-    .from("chapters")
-    .select("*")
-    .order("chapter_number", { ascending: true });
+export default function AdminChaptersPage() {
+  const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [filtered, setFiltered] = useState<Chapter[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
-  console.log("CHAPTERS:", chapters);
-  console.log("ERROR:", error);
+  useEffect(() => {
+    loadChapters();
+  }, []);
+
+  useEffect(() => {
+    const query = search.toLowerCase();
+
+    setFiltered(
+      chapters.filter(
+        (chapter) =>
+          chapter.title
+            .toLowerCase()
+            .includes(query) ||
+          chapter.slug
+            .toLowerCase()
+            .includes(query)
+      )
+    );
+  }, [search, chapters]);
+
+  async function loadChapters() {
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from("chapters")
+      .select("*")
+      .order("chapter_number", {
+        ascending: true,
+      });
+
+    if (error) {
+      toast.error(error.message);
+      setLoading(false);
+      return;
+    }
+
+    setChapters(data || []);
+    setFiltered(data || []);
+    setLoading(false);
+  }
+
+  async function deleteChapter(
+    id: string
+  ) {
+    const confirmed = confirm(
+      "Delete this chapter?"
+    );
+
+    if (!confirmed) return;
+
+    const { error } = await supabase
+      .from("chapters")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+
+    setChapters((prev) =>
+      prev.filter(
+        (chapter) => chapter.id !== id
+      )
+    );
+
+    toast.success("Chapter deleted");
+  }
 
   return (
-    <main className="min-h-screen bg-black p-10 text-white">
-      <div className="mb-10 flex items-center justify-between">
-        <h1 className="text-5xl font-bold text-red-500">
-          Chapters
-        </h1>
+    <AdminRoute>
+      <main className="min-h-screen bg-black p-8 text-white">
+        <div className="mx-auto max-w-7xl">
 
-        <Link
-          href="/admin/chapters/new"
-          className="rounded-xl bg-red-600 px-6 py-3 font-semibold hover:bg-red-700"
-        >
-          New Chapter
-        </Link>
-      </div>
+          {/* Header */}
 
-      {!chapters || chapters.length === 0 ? (
-        <div className="rounded-xl bg-zinc-900 p-6">
-          No chapters found.
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {chapters.map((chapter) => (
-            <div
-              key={chapter.id}
-              className="rounded-xl border border-red-900/30 bg-zinc-900 p-6"
-            >
-              <h2 className="text-2xl font-bold">
-                Chapter {chapter.chapter_number}
-              </h2>
+          <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+            <div>
+              <h1 className="text-5xl font-bold text-red-500">
+                Chapters
+              </h1>
 
               <p className="mt-2 text-zinc-400">
-                {chapter.title}
+                Manage your story chapters
               </p>
-
-              <p className="mt-1 text-sm text-zinc-500">
-                {chapter.slug}
-              </p>
-
-              <div className="mt-4 flex gap-3">
-                <Link
-                  href={`/chapters/${chapter.slug}`}
-                  className="rounded-lg bg-zinc-800 px-4 py-2"
-                >
-                  View
-                </Link>
-
-                <Link
-                  href={`/admin/chapters/${chapter.id}`}
-                  className="rounded-lg bg-red-600 px-4 py-2"
-                >
-                  Edit
-                </Link>
-              </div>
             </div>
-          ))}
+
+            <Link
+              href="/admin/chapters/new"
+              className="rounded-xl bg-red-600 px-6 py-3 font-semibold hover:bg-red-700"
+            >
+              + New Chapter
+            </Link>
+          </div>
+
+          {/* Search */}
+
+          <input
+            value={search}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+            placeholder="Search chapters..."
+            className="mb-6 w-full rounded-xl bg-zinc-900 p-4"
+          />
+
+          {/* Content */}
+
+          {loading ? (
+            <div className="rounded-2xl bg-zinc-900 p-8">
+              Loading chapters...
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="rounded-2xl bg-zinc-900 p-8">
+              No chapters found.
+            </div>
+          ) : (
+            <div className="space-y-4">
+
+              {filtered.map((chapter) => (
+                <div
+                  key={chapter.id}
+                  className="rounded-2xl border border-red-900/20 bg-zinc-900 p-5"
+                >
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+                    <div>
+                      <p className="text-sm text-red-400">
+                        Chapter {chapter.chapter_number}
+                      </p>
+
+                      <h2 className="text-2xl font-bold">
+                        {chapter.title}
+                      </h2>
+
+                      <p className="text-zinc-500">
+                        {chapter.slug}
+                      </p>
+                    </div>
+
+                    <div className="flex gap-3">
+
+                      <Link
+                        href={`/admin/chapters/${chapter.id}/edit`}
+                        className="rounded-xl border border-blue-500 px-4 py-2 hover:bg-blue-950"
+                      >
+                        Edit
+                      </Link>
+
+                      <button
+                        onClick={() =>
+                          deleteChapter(
+                            chapter.id
+                          )
+                        }
+                        className="rounded-xl border border-red-500 px-4 py-2 hover:bg-red-950"
+                      >
+                        Delete
+                      </button>
+
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+            </div>
+          )}
         </div>
-      )}
-    </main>
+      </main>
+    </AdminRoute>
   );
 }

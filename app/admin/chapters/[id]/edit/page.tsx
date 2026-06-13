@@ -1,28 +1,60 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import AdminRoute from "@/components/auth/AdminRoute";
 import toast from "react-hot-toast";
 
-export default function NewChapterPage() {
+type Chapter = {
+  id: string;
+  chapter_number: number;
+  title: string;
+  slug: string;
+  content: string;
+  cover_image: string | null;
+};
+
+export default function EditChapterPage() {
+  const params = useParams();
   const router = useRouter();
 
-  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [chapterNumber, setChapterNumber] =
-    useState("");
+  const [saving, setSaving] =
+    useState(false);
 
-  const [title, setTitle] = useState("");
+  const [chapter, setChapter] =
+    useState<Chapter | null>(null);
 
-  const [content, setContent] =
-    useState("");
+  useEffect(() => {
+    loadChapter();
+  }, []);
 
-  const [coverImage, setCoverImage] =
-    useState("");
+  async function loadChapter() {
+    const { data, error } =
+      await supabase
+        .from("chapters")
+        .select("*")
+        .eq("id", params.id)
+        .single();
 
-  function generateSlug(text: string) {
+    if (error) {
+      toast.error(error.message);
+      router.push(
+        "/admin/chapters"
+      );
+      return;
+    }
+
+    setChapter(data);
+    setLoading(false);
+  }
+
+  function generateSlug(
+    text: string
+  ) {
     return text
       .toLowerCase()
       .trim()
@@ -55,42 +87,44 @@ export default function NewChapterPage() {
       .from("chapter-covers")
       .getPublicUrl(fileName);
 
-    setCoverImage(publicUrl);
+    setChapter((prev) =>
+      prev
+        ? {
+            ...prev,
+            cover_image:
+              publicUrl,
+          }
+        : prev
+    );
 
     toast.success(
-      "Cover uploaded"
+      "Cover updated"
     );
   }
 
-  async function createChapter() {
-    if (
-      !chapterNumber ||
-      !title ||
-      !content
-    ) {
-      toast.error(
-        "Fill all required fields"
-      );
-      return;
-    }
+  async function saveChapter() {
+    if (!chapter) return;
 
     setSaving(true);
-
-    const slug =
-      generateSlug(title);
 
     const { error } =
       await supabase
         .from("chapters")
-        .insert({
+        .update({
           chapter_number:
-            Number(chapterNumber),
-          title,
-          slug,
-          content,
+            chapter.chapter_number,
+          title:
+            chapter.title,
+          slug:
+            generateSlug(
+              chapter.title
+            ),
+          content:
+            chapter.content,
           cover_image:
-            coverImage || null,
-        });
+            chapter.cover_image,
+        })
+        .eq("id", chapter.id);
 
     setSaving(false);
 
@@ -100,12 +134,24 @@ export default function NewChapterPage() {
     }
 
     toast.success(
-      "Chapter created"
+      "Chapter updated"
     );
 
     router.push(
       "/admin/chapters"
     );
+  }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-black p-10 text-white">
+        Loading...
+      </main>
+    );
+  }
+
+  if (!chapter) {
+    return null;
   }
 
   return (
@@ -114,12 +160,12 @@ export default function NewChapterPage() {
         <div className="mx-auto max-w-5xl">
 
           <h1 className="mb-8 text-5xl font-bold text-red-500">
-            New Chapter
+            Edit Chapter
           </h1>
 
           <div className="space-y-6 rounded-3xl border border-red-900/20 bg-zinc-900 p-8">
 
-            {/* Chapter Number */}
+            {/* Number */}
 
             <div>
               <label className="mb-2 block text-zinc-400">
@@ -128,14 +174,20 @@ export default function NewChapterPage() {
 
               <input
                 type="number"
-                value={chapterNumber}
+                value={
+                  chapter.chapter_number
+                }
                 onChange={(e) =>
-                  setChapterNumber(
-                    e.target.value
-                  )
+                  setChapter({
+                    ...chapter,
+                    chapter_number:
+                      Number(
+                        e.target
+                          .value
+                      ),
+                  })
                 }
                 className="w-full rounded-xl bg-black p-4"
-                placeholder="1"
               />
             </div>
 
@@ -147,18 +199,22 @@ export default function NewChapterPage() {
               </label>
 
               <input
-                value={title}
+                value={
+                  chapter.title
+                }
                 onChange={(e) =>
-                  setTitle(
-                    e.target.value
-                  )
+                  setChapter({
+                    ...chapter,
+                    title:
+                      e.target
+                        .value,
+                  })
                 }
                 className="w-full rounded-xl bg-black p-4"
-                placeholder="Chapter Title"
               />
             </div>
 
-            {/* Slug Preview */}
+            {/* Slug */}
 
             <div>
               <label className="mb-2 block text-zinc-400">
@@ -166,8 +222,9 @@ export default function NewChapterPage() {
               </label>
 
               <div className="rounded-xl bg-black p-4 text-red-400">
-                {generateSlug(title) ||
-                  "chapter-slug"}
+                {generateSlug(
+                  chapter.title
+                )}
               </div>
             </div>
 
@@ -195,9 +252,11 @@ export default function NewChapterPage() {
                 className="w-full rounded-xl bg-black p-4"
               />
 
-              {coverImage && (
+              {chapter.cover_image && (
                 <img
-                  src={coverImage}
+                  src={
+                    chapter.cover_image
+                  }
                   alt=""
                   className="mt-4 h-64 w-full rounded-2xl object-cover"
                 />
@@ -213,14 +272,18 @@ export default function NewChapterPage() {
 
               <textarea
                 rows={20}
-                value={content}
+                value={
+                  chapter.content
+                }
                 onChange={(e) =>
-                  setContent(
-                    e.target.value
-                  )
+                  setChapter({
+                    ...chapter,
+                    content:
+                      e.target
+                        .value,
+                  })
                 }
                 className="w-full rounded-xl bg-black p-4"
-                placeholder="Write chapter..."
               />
             </div>
 
@@ -228,14 +291,14 @@ export default function NewChapterPage() {
 
             <button
               onClick={
-                createChapter
+                saveChapter
               }
               disabled={saving}
               className="rounded-xl bg-red-600 px-8 py-4 font-semibold hover:bg-red-700 disabled:opacity-50"
             >
               {saving
-                ? "Creating..."
-                : "Create Chapter"}
+                ? "Saving..."
+                : "Save Changes"}
             </button>
 
           </div>

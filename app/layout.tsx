@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Inter, Cinzel } from "next/font/google";
-
+import AdScript from "@/components/ads/AdScript";
 import "./globals.css";
 
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-
+import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
@@ -19,6 +19,8 @@ const cinzel = Cinzel({
   variable: "--font-cinzel",
   display: "swap",
 });
+
+
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://redeye-universe.vercel.app"),
@@ -49,6 +51,7 @@ export const metadata: Metadata = {
       "A dark fantasy universe built around Agastha Crystals, rebellion, and forbidden power.",
     url: "https://redeye-universe.vercel.app",
     siteName: "Red-Eye Universe",
+    images: ["/og-image.jpg"],
     type: "website",
     locale: "en_US",
   },
@@ -58,7 +61,8 @@ export const metadata: Metadata = {
     title: "Red-Eye Universe",
     description:
       "Explore the dark fantasy world of Agastha Crystals and forbidden power.",
-  },
+    images: ["/og-image.jpg"],
+    },
 
   robots: {
     index: true,
@@ -80,11 +84,12 @@ export default function RootLayout({
       <body className="flex min-h-screen flex-col bg-black text-white antialiased">
         <Navbar />
 
-        <main className="flex-1">
+        <main className="flex-1 pt-24">
           {children}
         </main>
 
         <Footer />
+        <AdScript />
 
         <Toaster
           position="top-right"
@@ -97,6 +102,7 @@ export default function RootLayout({
             },
           }}
         />
+        <Analytics />
       </body>
     </html>
   );

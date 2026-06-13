@@ -2,26 +2,42 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, Search, LogOut } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
+import Image from "next/image";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+
+  type Profile = {
+    username: string | null;
+    avatar_url: string | null;
+    role: string | null;
+  };
+
+  const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
     loadUser();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_, session) => {
+    } = supabase.auth.onAuthStateChange(async (_, session) => {
       setUser(session?.user ?? null);
+
+      if (session?.user) {
+        await loadUser();
+      } else {
+        setProfile(null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -43,11 +59,25 @@ export default function Navbar() {
     } = await supabase.auth.getUser();
 
     setUser(user);
+
+    if (!user) return;
+
+    const { data } = await supabase
+      .from("profiles")
+      .select("username, avatar_url, role")
+      .eq("user_id", user.id)
+      .single();
+
+    setProfile(data);
   }
 
   async function logout() {
     await supabase.auth.signOut();
-    window.location.href = "/";
+
+    setProfile(null);
+    setUser(null);
+
+    router.push("/");
   }
 
   return (
@@ -60,11 +90,7 @@ export default function Navbar() {
         z-[999]
         transition-all
         duration-500
-        ${
-          scrolled
-            ? "bg-black/70 backdrop-blur-2xl"
-            : "bg-transparent"
-        }
+        ${scrolled ? "bg-black/70 backdrop-blur-2xl" : "bg-transparent"}
       `}
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
@@ -144,23 +170,15 @@ export default function Navbar() {
         >
           <NavLink href="/" label="Universe" pathname={pathname} />
 
-          <NavLink
-            href="/chapters"
-            label="Chapters"
-            pathname={pathname}
-          />
+          <NavLink href="/chapters" label="Chapters" pathname={pathname} />
 
-          <NavLink
-            href="/characters"
-            label="Characters"
-            pathname={pathname}
-          />
+          <NavLink href="/characters" label="Characters" pathname={pathname} />
 
-          <NavLink
-            href="/community"
-            label="Community"
-            pathname={pathname}
-          />
+          <NavLink href="/community" label="Community" pathname={pathname} />
+
+          {profile?.role === "admin" && (
+            <NavLink href="/admin" label="Admin" pathname={pathname} />
+          )}
         </div>
 
         {/* RIGHT SIDE */}
@@ -189,32 +207,48 @@ export default function Navbar() {
               <Link
                 href="/profile"
                 className="
-                flex
-                items-center
-                gap-3
-                rounded-xl
-                border
-                border-zinc-800
-                px-3
-                py-2
-                transition
-                hover:border-red-500/50
-              "
+    flex
+    items-center
+    gap-3
+    rounded-xl
+    border
+    border-zinc-800
+    px-3
+    py-2
+    transition
+    hover:border-red-500/50
+  "
               >
-                <div
-                  className="
-                  h-8
-                  w-8
-                  rounded-full
-                  bg-gradient-to-br
-                  from-red-500
-                  to-red-800
-                "
-                />
+                {profile?.avatar_url ? (
+                  <Image
+                    src={profile.avatar_url}
+                    alt="avatar"
+                    width={36}
+                    height={36}
+                    className="rounded-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="
+        h-9
+        w-9
+        rounded-full
+        bg-gradient-to-br
+        from-red-500
+        to-red-800
+      "
+                  />
+                )}
 
-                <span className="text-sm">
-                  Profile
-                </span>
+                <div className="text-left">
+                  <div className="text-sm font-semibold">
+                    {profile?.username ?? "Profile"}
+                  </div>
+
+                  {profile?.role === "admin" && (
+                    <div className="text-xs text-red-400">Administrator</div>
+                  )}
+                </div>
               </Link>
 
               <Link
@@ -234,6 +268,19 @@ export default function Navbar() {
               "
               >
                 Library
+              </Link>
+              <Link
+                href="/settings"
+                className="
+    rounded-xl
+    border
+    border-zinc-800
+    px-4
+    py-2.5
+    hover:border-red-500/50
+  "
+              >
+                Settings
               </Link>
 
               <button
@@ -291,10 +338,7 @@ export default function Navbar() {
 
         {/* MOBILE BUTTON */}
 
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden"
-        >
+        <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden">
           {menuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
@@ -347,24 +391,84 @@ export default function Navbar() {
 
               {!user ? (
                 <>
-                  <Link href="/login">Login</Link>
+                  <Link href="/login" onClick={() => setMenuOpen(false)}>
+                    Login
+                  </Link>
 
-                  <Link href="/register">
+                  <Link href="/register" onClick={() => setMenuOpen(false)}>
                     Begin The Journey
                   </Link>
                 </>
               ) : (
                 <>
-                  <Link href="/profile">
-                    Profile
+                  <Link
+                    href="/profile"
+                    className="
+    flex
+    items-center
+    gap-3
+    rounded-xl
+    border
+    border-zinc-800
+    px-3
+    py-2
+    transition
+    hover:border-red-500/50
+  "
+                  >
+                    {profile?.avatar_url ? (
+                      <img
+                        src={profile.avatar_url}
+                        alt="avatar"
+                        className="
+        h-9
+        w-9
+        rounded-full
+        object-cover
+      "
+                      />
+                    ) : (
+                      <div
+                        className="
+        h-9
+        w-9
+        rounded-full
+        bg-gradient-to-br
+        from-red-500
+        to-red-800
+      "
+                      />
+                    )}
+
+                    <div>
+                      <div className="text-sm font-semibold">
+                        {profile?.username ?? "Profile"}
+                      </div>
+
+                      {profile?.role === "admin" && (
+                        <div className="text-xs text-red-400">Admin</div>
+                      )}
+                    </div>
                   </Link>
 
-                  <Link href="/library">
+                  <Link href="/library" onClick={() => setMenuOpen(false)}>
                     Library
                   </Link>
+                  <Link href="/settings" onClick={() => setMenuOpen(false)}>
+                    Settings
+                  </Link>
+
+                  {profile?.role === "admin" && (
+                    <Link href="/admin" onClick={() => setMenuOpen(false)}>
+                      Admin Panel
+                    </Link>
+                  )}
 
                   <button
-                    onClick={logout}
+                    onClick={async () => {
+                      setMenuOpen(false);
+                      await logout();
+                    }}
                     className="text-left"
                   >
                     Logout
@@ -437,11 +541,7 @@ function NavLink({
         to-red-700
         transition-all
         duration-300
-        ${
-          active
-            ? "w-full"
-            : "w-0 group-hover:w-full"
-        }
+        ${active ? "w-full" : "w-0 group-hover:w-full"}
       `}
       />
     </Link>

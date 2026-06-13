@@ -2,363 +2,445 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
+import { ArrowLeft, Upload } from "lucide-react";
 
-export default function CharacterEditor() {
-  const router = useRouter();
+type Character = {
+  id: string;
+  name: string;
+  title: string;
+  description: string;
+  danger_level: string;
+  faction: string;
+  rank: string;
+  status: string;
+  age: number | null;
+  power_level: string;
+  quote: string;
+  abilities: string;
+  avatar_url: string;
+  banner_url: string;
+  slug: string;
+};
+
+export default function EditCharacterPage() {
   const params = useParams();
-
-  const id = params?.id as string;
+  const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const [character, setCharacter] = useState<any>(null);
+  const [avatarFile, setAvatarFile] =
+    useState<File | null>(null);
+
+  const [bannerFile, setBannerFile] =
+    useState<File | null>(null);
+
+  const [character, setCharacter] =
+    useState<Character | null>(null);
 
   useEffect(() => {
-    if (id) {
-      loadCharacter();
+    loadCharacter();
+  }, []);
+
+  async function loadCharacter() {
+    try {
+      const { data, error } = await supabase
+        .from("characters")
+        .select("*")
+        .eq("id", params.id)
+        .single();
+
+      if (error) throw error;
+
+      setCharacter(data);
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Character not found");
+      router.push("/admin/characters");
+    } finally {
+      setLoading(false);
     }
-  }, [id]);
+  }
 
-  async function uploadAvatar(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+  async function uploadImage(
+    file: File
+  ): Promise<string> {
+    const ext = file.name.split(".").pop();
 
-    if (!file) return;
-
-    const fileName = `${Date.now()}-${file.name}`;
+    const fileName = `${crypto.randomUUID()}.${ext}`;
 
     const { error } = await supabase.storage
       .from("character-images")
       .upload(fileName, file);
 
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
+    if (error) throw error;
 
     const {
       data: { publicUrl },
-    } = supabase.storage.from("character-images").getPublicUrl(fileName);
+    } = supabase.storage
+      .from("character-images")
+      .getPublicUrl(fileName);
 
-    setCharacter({
-      ...character,
-      avatar_url: publicUrl,
-    });
-
-    toast.success("Portrait uploaded");
+    return publicUrl;
   }
 
-  async function loadCharacter() {
-    setLoading(true);
-
-    const { data, error } = await supabase
-      .from("characters")
-      .select("*")
-      .eq("id", id)
-      .single();
-
-    if (error) {
-      toast.error(error.message);
-      setLoading(false);
-      return;
-    }
-
-    setCharacter(data);
-    setLoading(false);
+  function generateSlug(name: string) {
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9 ]/g, "")
+      .replace(/\s+/g, "-");
   }
-
-  // async function saveCharacter() {
-  //   setSaving(true);
-
-  //   const { error } = await supabase
-  //     .from("characters")
-  //     .update({
-  //       name: character.name,
-  //       title: character.title,
-  //       description: character.description,
-  //       faction: character.faction,
-  //       danger_level: character.danger_level,
-
-  //       avatar_url: character.avatar_url,
-  //       rank: character.rank,
-  //       status: character.status,
-  //       age: Number(character.age) || null,
-  //       power_level: character.power_level,
-  //       quote: character.quote,
-  //       abilities: character.abilities,
-  //     })
-  //     .eq("id", id);
-
-  //   setSaving(false);
-
-  //   if (error) {
-  //     toast.error(error.message);
-  //     return;
-  //   }
-
-  //   toast.success("Character updated");
-  // }
 
   async function saveCharacter() {
+    if (!character) return;
+
     try {
       setSaving(true);
 
-      console.log("START SAVE");
+      let avatarUrl =
+        character.avatar_url || "";
 
-      const payload = {
-        name: character.name,
-        title: character.title,
-        description: character.description,
-        faction: character.faction,
-        danger_level: character.danger_level,
-        rank: character.rank,
-        status: character.status,
-        age: character.age,
-        power_level: character.power_level,
-        quote: character.quote,
-        abilities: character.abilities,
-        avatar_url: character.avatar_url,
-      };
+      let bannerUrl =
+        character.banner_url || "";
 
-      console.log("PAYLOAD:", payload);
-
-      const { data, error } = await supabase
-        .from("characters")
-        .update(payload)
-        .eq("id", id)
-        .select();
-
-      console.log("RESULT:", data);
-      console.log("ERROR:", error);
-
-      if (error) {
-        toast.error(error.message);
-        return;
+      if (avatarFile) {
+        avatarUrl = await uploadImage(
+          avatarFile
+        );
       }
 
-      toast.success("Character updated");
-    } catch (err) {
-      console.error("SAVE FAILED:", err);
+      if (bannerFile) {
+        bannerUrl = await uploadImage(
+          bannerFile
+        );
+      }
+
+      const { error } = await supabase
+        .from("characters")
+        .update({
+          ...character,
+          avatar_url: avatarUrl,
+          banner_url: bannerUrl,
+          slug: generateSlug(
+            character.name
+          ),
+        })
+        .eq("id", character.id);
+
+      if (error) throw error;
+
+      toast.success(
+        "Character updated"
+      );
+
+      router.push(
+        "/admin/characters"
+      );
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message);
     } finally {
       setSaving(false);
     }
   }
 
-  async function deleteCharacter() {
-    const confirmed = window.confirm("Delete this character permanently?");
-
-    if (!confirmed) return;
-
-    const { error } = await supabase.from("characters").delete().eq("id", id);
-
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-
-    toast.success("Character deleted");
-
-    router.push("/admin/characters");
-  }
-
   if (loading) {
     return (
       <main className="min-h-screen bg-black p-10 text-white">
-        <div className="animate-pulse text-xl">Loading Character...</div>
+        Loading...
       </main>
     );
   }
 
   if (!character) {
-    return (
-      <main className="min-h-screen bg-black p-10 text-white">
-        <h1 className="text-4xl font-bold text-red-500">Character Not Found</h1>
-      </main>
-    );
+    return null;
   }
 
   return (
-    <main className="min-h-screen bg-black p-10 text-white">
-      <h1 className="mb-8 text-5xl font-bold text-red-500">Edit Character</h1>
-      <div>
-        <label className="mb-2 block text-zinc-400">Character Portrait</label>
+    <main className="min-h-screen bg-black p-8 text-white">
+      <div className="mx-auto max-w-5xl">
+        <Link
+          href="/admin/characters"
+          className="mb-8 inline-flex items-center gap-2 text-zinc-400 hover:text-white"
+        >
+          <ArrowLeft size={18} />
+          Back
+        </Link>
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={uploadAvatar}
-          className="w-full rounded-xl bg-zinc-900 p-4"
-        />
+        <h1 className="mb-10 text-5xl font-bold text-red-500">
+          Edit Character
+        </h1>
 
-        {character.avatar_url && (
-          <img
-            src={character.avatar_url}
-            alt="Preview"
-            className="
-        mt-4
-        h-72
-        w-72
-        rounded-2xl
-        object-cover
-        border
-        border-red-500
-      "
-          />
-        )}
-      </div>
-      <div className="space-y-4">
-        <input
-          value={character.name ?? ""}
-          onChange={(e) =>
-            setCharacter({
-              ...character,
-              name: e.target.value,
-            })
-          }
-          placeholder="Name"
-          className="w-full rounded-xl bg-zinc-900 p-4"
-        />
+        <div className="rounded-3xl border border-red-900/20 bg-zinc-900 p-8">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Input
+              label="Name"
+              value={character.name || ""}
+              onChange={(value) =>
+                setCharacter({
+                  ...character,
+                  name: value,
+                })
+              }
+            />
 
-        <input
-          value={character.title ?? ""}
-          onChange={(e) =>
-            setCharacter({
-              ...character,
-              title: e.target.value,
-            })
-          }
-          placeholder="Title"
-          className="w-full rounded-xl bg-zinc-900 p-4"
-        />
+            <Input
+              label="Title"
+              value={
+                character.title || ""
+              }
+              onChange={(value) =>
+                setCharacter({
+                  ...character,
+                  title: value,
+                })
+              }
+            />
 
-        <textarea
-          value={character.description ?? ""}
-          onChange={(e) =>
-            setCharacter({
-              ...character,
-              description: e.target.value,
-            })
-          }
-          placeholder="Biography"
-          className="h-40 w-full rounded-xl bg-zinc-900 p-4"
-        />
+            <Input
+              label="Danger Level"
+              value={
+                character.danger_level ||
+                ""
+              }
+              onChange={(value) =>
+                setCharacter({
+                  ...character,
+                  danger_level:
+                    value,
+                })
+              }
+            />
 
-        <input
-          value={character.faction ?? ""}
-          onChange={(e) =>
-            setCharacter({
-              ...character,
-              faction: e.target.value,
-            })
-          }
-          placeholder="Faction"
-          className="w-full rounded-xl bg-zinc-900 p-4"
-        />
+            <Input
+              label="Faction"
+              value={
+                character.faction ||
+                ""
+              }
+              onChange={(value) =>
+                setCharacter({
+                  ...character,
+                  faction: value,
+                })
+              }
+            />
 
-        <input
-          value={character.danger_level ?? ""}
-          onChange={(e) =>
-            setCharacter({
-              ...character,
-              danger_level: e.target.value,
-            })
-          }
-          placeholder="Danger Level"
-          className="w-full rounded-xl bg-zinc-900 p-4"
-        />
+            <Input
+              label="Rank"
+              value={
+                character.rank || ""
+              }
+              onChange={(value) =>
+                setCharacter({
+                  ...character,
+                  rank: value,
+                })
+              }
+            />
 
-        <input
-          value={character.rank ?? ""}
-          onChange={(e) =>
-            setCharacter({
-              ...character,
-              rank: e.target.value,
-            })
-          }
-          placeholder="Rank"
-          className="w-full rounded-xl bg-zinc-900 p-4"
-        />
+            <Input
+              label="Status"
+              value={
+                character.status ||
+                ""
+              }
+              onChange={(value) =>
+                setCharacter({
+                  ...character,
+                  status: value,
+                })
+              }
+            />
 
-        <input
-          value={character.status ?? ""}
-          onChange={(e) =>
-            setCharacter({
-              ...character,
-              status: e.target.value,
-            })
-          }
-          placeholder="Status"
-          className="w-full rounded-xl bg-zinc-900 p-4"
-        />
+            <Input
+              label="Age"
+              value={
+                character.age
+                  ?.toString() || ""
+              }
+              onChange={(value) =>
+                setCharacter({
+                  ...character,
+                  age:
+                    Number(value) ||
+                    null,
+                })
+              }
+            />
 
-        <input
-          type="number"
-          value={character.age ?? ""}
-          onChange={(e) =>
-            setCharacter({
-              ...character,
-              age: e.target.value,
-            })
-          }
-          placeholder="Age"
-          className="w-full rounded-xl bg-zinc-900 p-4"
-        />
+            <Input
+              label="Power Level"
+              value={
+                character.power_level ||
+                ""
+              }
+              onChange={(value) =>
+                setCharacter({
+                  ...character,
+                  power_level:
+                    value,
+                })
+              }
+            />
+          </div>
 
-        <input
-          value={character.power_level ?? ""}
-          onChange={(e) =>
-            setCharacter({
-              ...character,
-              power_level: e.target.value,
-            })
-          }
-          placeholder="Power Level"
-          className="w-full rounded-xl bg-zinc-900 p-4"
-        />
+          <div className="mt-6">
+            <label className="mb-2 block">
+              Description
+            </label>
 
-        <textarea
-          value={character.quote ?? ""}
-          onChange={(e) =>
-            setCharacter({
-              ...character,
-              quote: e.target.value,
-            })
-          }
-          placeholder="Character Quote"
-          className="h-28 w-full rounded-xl bg-zinc-900 p-4"
-        />
+            <textarea
+              rows={6}
+              value={
+                character.description ||
+                ""
+              }
+              onChange={(e) =>
+                setCharacter({
+                  ...character,
+                  description:
+                    e.target.value,
+                })
+              }
+              className="w-full rounded-xl bg-black p-4 outline-none ring-1 ring-zinc-800 focus:ring-red-500"
+            />
+          </div>
 
-        <textarea
-          value={character.abilities ?? ""}
-          onChange={(e) =>
-            setCharacter({
-              ...character,
-              abilities: e.target.value,
-            })
-          }
-          placeholder="Abilities"
-          className="h-40 w-full rounded-xl bg-zinc-900 p-4"
-        />
+          <div className="mt-6">
+            <label className="mb-2 block">
+              Quote
+            </label>
 
-        <div className="flex gap-4 pt-4">
+            <textarea
+              rows={3}
+              value={
+                character.quote || ""
+              }
+              onChange={(e) =>
+                setCharacter({
+                  ...character,
+                  quote:
+                    e.target.value,
+                })
+              }
+              className="w-full rounded-xl bg-black p-4 outline-none ring-1 ring-zinc-800 focus:ring-red-500"
+            />
+          </div>
+
+          <div className="mt-6">
+            <label className="mb-2 block">
+              Abilities
+            </label>
+
+            <textarea
+              rows={5}
+              value={
+                character.abilities ||
+                ""
+              }
+              onChange={(e) =>
+                setCharacter({
+                  ...character,
+                  abilities:
+                    e.target.value,
+                })
+              }
+              className="w-full rounded-xl bg-black p-4 outline-none ring-1 ring-zinc-800 focus:ring-red-500"
+            />
+          </div>
+
+          <div className="mt-8">
+            <label className="mb-3 block">
+              Replace Avatar
+            </label>
+
+            <label className="flex cursor-pointer items-center gap-3 rounded-xl bg-black p-4 ring-1 ring-zinc-800">
+              <Upload size={18} />
+              Upload Avatar
+
+              <input
+                hidden
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setAvatarFile(
+                    e.target
+                      .files?.[0] ||
+                      null
+                  )
+                }
+              />
+            </label>
+          </div>
+
+          <div className="mt-6">
+            <label className="mb-3 block">
+              Replace Banner
+            </label>
+
+            <label className="flex cursor-pointer items-center gap-3 rounded-xl bg-black p-4 ring-1 ring-zinc-800">
+              <Upload size={18} />
+              Upload Banner
+
+              <input
+                hidden
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setBannerFile(
+                    e.target
+                      .files?.[0] ||
+                      null
+                  )
+                }
+              />
+            </label>
+          </div>
+
           <button
             onClick={saveCharacter}
             disabled={saving}
-            className="rounded-xl bg-green-600 px-6 py-3 hover:bg-green-700 disabled:opacity-50"
+            className="mt-10 rounded-xl bg-red-600 px-8 py-4 font-semibold hover:bg-red-700 disabled:opacity-50"
           >
-            {saving ? "Saving..." : "Save Character"}
-          </button>
-
-          <button
-            onClick={deleteCharacter}
-            className="rounded-xl bg-red-600 px-6 py-3 hover:bg-red-700"
-          >
-            Delete Character
+            {saving
+              ? "Saving..."
+              : "Save Changes"}
           </button>
         </div>
       </div>
     </main>
+  );
+}
+
+function Input({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (
+    value: string
+  ) => void;
+}) {
+  return (
+    <div>
+      <label className="mb-2 block">
+        {label}
+      </label>
+
+      <input
+        value={value}
+        onChange={(e) =>
+          onChange(e.target.value)
+        }
+        className="w-full rounded-xl bg-black p-4 outline-none ring-1 ring-zinc-800 focus:ring-red-500"
+      />
+    </div>
   );
 }
