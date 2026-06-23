@@ -90,13 +90,13 @@ export default function Navbar() {
         z-[999]
         transition-all
         duration-500
-        ${scrolled ? "bg-black/70 backdrop-blur-2xl" : "bg-transparent"}
+        bg-black/70 backdrop-blur-2xl border-b border-red-500/10
       `}
     >
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+      <div className="mx-auto flex min-h-15 max-w-[1600px] items-center justify-between px-6">
         {/* LOGO */}
 
-        <Link href="/" className="group flex items-center gap-4">
+        <Link href="/" className="group flex items-center gap-2">
           <motion.div
             animate={{
               rotate: [45, 90, 45],
@@ -107,8 +107,8 @@ export default function Navbar() {
               ease: "easeInOut",
             }}
             className="
-              h-10
-              w-10
+              h-8
+              w-8
               rotate-45
               rounded-xl
               bg-gradient-to-br
@@ -123,9 +123,9 @@ export default function Navbar() {
             <div
               className="
               font-title
-              text-2xl
+              text-lg md:text-xl
               font-black
-              tracking-[0.35em]
+              tracking-[0.2em]
               text-transparent
               bg-clip-text
               bg-gradient-to-b
@@ -139,11 +139,13 @@ export default function Navbar() {
 
             <div
               className="
-              text-[10px]
-              uppercase
-              tracking-[0.35em]
-              text-zinc-500
-            "
+hidden
+sm:block
+text-[10px]
+uppercase
+tracking-[0.2em]
+text-zinc-300
+"
             >
               DARK FANTASY UNIVERSE
             </div>
@@ -155,9 +157,9 @@ export default function Navbar() {
         <div
           className="
           hidden
-          md:flex
+          lg:flex
           items-center
-          gap-8
+          gap-5
           rounded-full
           border
           border-red-500/10
@@ -183,13 +185,13 @@ export default function Navbar() {
 
         {/* RIGHT SIDE */}
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-3 lg:flex">
           <Link
             href="/search"
             className="
             flex
-            h-10
-            w-10
+            h-11
+            w-11
             items-center
             justify-center
             rounded-xl
@@ -338,7 +340,7 @@ export default function Navbar() {
 
         {/* MOBILE BUTTON */}
 
-        <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden">
+        <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden">
           {menuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
       </div>
@@ -361,41 +363,104 @@ export default function Navbar() {
               y: -30,
             }}
             className="
-            md:hidden
+            lg:hidden
             border-t
             border-red-500/10
             bg-black/90
             backdrop-blur-3xl
           "
           >
-            <div className="flex flex-col gap-5 p-6">
-              <Link href="/" onClick={() => setMenuOpen(false)}>
+            <div className="flex flex-col gap-2 p-6">
+              <Link
+                className="
+rounded-xl
+px-4
+py-3
+hover:bg-red-500/10
+"
+                href="/"
+                onClick={() => setMenuOpen(false)}
+              >
                 Universe
               </Link>
 
-              <Link href="/chapters" onClick={() => setMenuOpen(false)}>
+              <Link
+                className="
+rounded-xl
+px-4
+py-3
+hover:bg-red-500/10
+"
+                href="/chapters"
+                onClick={() => setMenuOpen(false)}
+              >
                 Chapters
               </Link>
 
-              <Link href="/characters" onClick={() => setMenuOpen(false)}>
+              <Link
+                className="
+rounded-xl
+px-4
+py-3
+hover:bg-red-500/10
+"
+                href="/characters"
+                onClick={() => setMenuOpen(false)}
+              >
                 Characters
               </Link>
 
-              <Link href="/community" onClick={() => setMenuOpen(false)}>
+              <Link
+                className="
+rounded-xl
+px-4
+py-3
+hover:bg-red-500/10
+"
+                href="/community"
+                onClick={() => setMenuOpen(false)}
+              >
                 Community
               </Link>
 
-              <Link href="/search" onClick={() => setMenuOpen(false)}>
+              <Link
+                className="
+rounded-xl
+px-4
+py-3
+hover:bg-red-500/10
+"
+                href="/search"
+                onClick={() => setMenuOpen(false)}
+              >
                 Search
               </Link>
 
               {!user ? (
                 <>
-                  <Link href="/login" onClick={() => setMenuOpen(false)}>
+                  <Link
+                    className="
+rounded-xl
+px-4
+py-3
+hover:bg-red-500/10
+"
+                    href="/login"
+                    onClick={() => setMenuOpen(false)}
+                  >
                     Login
                   </Link>
 
-                  <Link href="/register" onClick={() => setMenuOpen(false)}>
+                  <Link
+                    className="
+rounded-xl
+px-4
+py-3
+hover:bg-red-500/10
+"
+                    href="/register"
+                    onClick={() => setMenuOpen(false)}
+                  >
                     Begin The Journey
                   </Link>
                 </>

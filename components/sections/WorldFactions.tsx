@@ -99,7 +99,7 @@ export default function WorldFactions() {
 
         {/* Cards */}
 
-        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
 
           {factions.map((faction, index) => {
             const Icon = faction.icon;
@@ -205,7 +205,7 @@ export default function WorldFactions() {
 
                   <div className="mt-6">
 
-                    <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-widest text-zinc-500">
+                    <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-widest text-zinc-300">
                       <span>Influence</span>
                       <span>High</span>
                     </div>

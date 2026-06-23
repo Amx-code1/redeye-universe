@@ -66,7 +66,7 @@ export default async function CharactersPage() {
                 {totalCharacters}
               </div>
 
-              <p className="mt-2 text-zinc-500">
+              <p className="mt-2 text-zinc-300">
                 Total Characters
               </p>
             </div>
@@ -78,7 +78,7 @@ export default async function CharactersPage() {
                 {legendaryCharacters}
               </div>
 
-              <p className="mt-2 text-zinc-500">
+              <p className="mt-2 text-zinc-300">
                 Legendary Warriors
               </p>
             </div>
@@ -90,7 +90,7 @@ export default async function CharactersPage() {
                 {dangerousCharacters}
               </div>
 
-              <p className="mt-2 text-zinc-500">
+              <p className="mt-2 text-zinc-300">
                 Extreme Threats
               </p>
             </div>
@@ -108,12 +108,12 @@ export default async function CharactersPage() {
                 Character Archive
               </h2>
 
-              <p className="mt-3 text-zinc-500">
+              <p className="mt-3 text-zinc-300">
                 Discover every known individual in the Red-Eye Universe.
               </p>
             </div>
 
-            <div className="rounded-full border border-red-900/20 bg-zinc-950 px-5 py-3 text-sm text-zinc-500">
+            <div className="rounded-full border border-red-900/20 bg-zinc-950 px-5 py-3 text-sm text-zinc-300">
               {totalCharacters} Characters Loaded
             </div>
           </div>
@@ -124,12 +124,12 @@ export default async function CharactersPage() {
                 Failed to Load Characters
               </h3>
 
-              <p className="mt-4 text-zinc-500">
+              <p className="mt-4 text-zinc-300">
                 An error occurred while loading character data.
               </p>
             </div>
           ) : safeCharacters.length > 0 ? (
-            <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {safeCharacters.map((character) => (
                 <CharacterCard
                   key={character.id}
@@ -143,7 +143,7 @@ export default async function CharactersPage() {
                 No Characters Found
               </h3>
 
-              <p className="mt-4 text-zinc-500">
+              <p className="mt-4 text-zinc-300">
                 Add characters from the admin panel to populate the archive.
               </p>
             </div>

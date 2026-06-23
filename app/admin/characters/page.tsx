@@ -143,7 +143,7 @@ export default function AdminCharactersPage() {
 
         <div className="relative mb-8">
           <Search
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300"
             size={18}
           />
 
@@ -182,7 +182,7 @@ export default function AdminCharactersPage() {
                 size={48}
               />
 
-              <h2 className="text-2xl font-bold">
+              <h2 className="text-xl font-bold">
                 No Characters Found
               </h2>
 
@@ -217,7 +217,7 @@ export default function AdminCharactersPage() {
                             className="object-cover"
                           />
                         ) : (
-                          <div className="flex h-full items-center justify-center text-zinc-500">
+                          <div className="flex h-full items-center justify-center text-zinc-300">
                             N/A
                           </div>
                         )}
@@ -284,7 +284,7 @@ export default function AdminCharactersPage() {
         {deleteModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
             <div className="w-full max-w-md rounded-3xl bg-zinc-900 p-8">
-              <h2 className="text-2xl font-bold text-red-500">
+              <h2 className="text-xl font-bold text-red-500">
                 Delete Character
               </h2>
 

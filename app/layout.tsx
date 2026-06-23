@@ -84,7 +84,7 @@ export default function RootLayout({
       <body className="flex min-h-screen flex-col bg-black text-white antialiased">
         <Navbar />
 
-        <main className="flex-1 pt-24">
+        <main className="flex-1 ">
           {children}
         </main>
 

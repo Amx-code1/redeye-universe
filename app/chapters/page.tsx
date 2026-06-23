@@ -64,7 +64,7 @@ export default async function ChaptersPage() {
                 {safeChapters.length}
               </div>
 
-              <div className="mt-2 text-zinc-500">
+              <div className="mt-2 text-zinc-300">
                 Published Chapters
               </div>
             </div>
@@ -76,7 +76,7 @@ export default async function ChaptersPage() {
                 Main Story
               </div>
 
-              <div className="mt-2 text-zinc-500">
+              <div className="mt-2 text-zinc-300">
                 Ongoing Journey
               </div>
             </div>
@@ -88,7 +88,7 @@ export default async function ChaptersPage() {
                 Endless
               </div>
 
-              <div className="mt-2 text-zinc-500">
+              <div className="mt-2 text-zinc-300">
                 Mysteries Ahead
               </div>
             </div>
@@ -105,12 +105,12 @@ export default async function ChaptersPage() {
               Chapter Archive
             </h2>
 
-            <p className="mt-3 text-zinc-500">
+            <p className="mt-3 text-zinc-300">
               Every chapter published in chronological order.
             </p>
           </div>
 
-          <div className="rounded-full border border-red-900/20 bg-zinc-950 px-5 py-3 text-sm text-zinc-500">
+          <div className="rounded-full border border-red-900/20 bg-zinc-950 px-5 py-3 text-sm text-zinc-300">
             {safeChapters.length} Chapters Available
           </div>
         </div>
@@ -121,7 +121,7 @@ export default async function ChaptersPage() {
               Failed To Load Chapters
             </h3>
 
-            <p className="mt-4 text-zinc-500">
+            <p className="mt-4 text-zinc-300">
               An error occurred while loading chapter data.
             </p>
           </div>
@@ -152,7 +152,7 @@ export default async function ChaptersPage() {
                 >
                   <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-red-500 via-red-600 to-transparent" />
 
-                  <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                     <div>
                       <div className="mb-4 flex flex-wrap gap-3">
                         <div className="rounded-full bg-red-950/40 px-4 py-2 text-sm font-semibold text-red-400">
@@ -168,7 +168,7 @@ export default async function ChaptersPage() {
                         {chapter.title}
                       </h3>
 
-                      <div className="mt-5 flex flex-wrap gap-5 text-sm text-zinc-500">
+                      <div className="mt-5 flex flex-wrap gap-5 text-sm text-zinc-300">
                         <div className="flex items-center gap-2">
                           <BookOpen size={16} />
                           Main Story
@@ -202,7 +202,7 @@ export default async function ChaptersPage() {
               No Chapters Published
             </h3>
 
-            <p className="mt-4 text-zinc-500">
+            <p className="mt-4 text-zinc-300">
               Publish your first chapter from the admin panel.
             </p>
           </div>

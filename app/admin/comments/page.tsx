@@ -196,13 +196,13 @@ export default function AdminCommentsPage() {
                         }
                       </span>
 
-                      <span className="text-zinc-500">
+                      <span className="text-zinc-300">
                         {
                           comment.user_email
                         }
                       </span>
 
-                      <span className="text-zinc-500">
+                      <span className="text-zinc-300">
                         ❤️{" "}
                         {
                           comment.likes

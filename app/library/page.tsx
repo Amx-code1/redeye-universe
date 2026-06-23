@@ -165,7 +165,7 @@ export default function LibraryPage() {
 
             <div className="mt-10 flex flex-wrap gap-4">
               <div className="rounded-2xl border border-red-900/20 bg-zinc-950/80 px-6 py-4">
-                <div className="text-sm text-zinc-500">
+                <div className="text-sm text-zinc-300">
                   Saved Chapters
                 </div>
 
@@ -175,7 +175,7 @@ export default function LibraryPage() {
               </div>
 
               <div className="rounded-2xl border border-red-900/20 bg-zinc-950/80 px-6 py-4">
-                <div className="text-sm text-zinc-500">
+                <div className="text-sm text-zinc-300">
                   Collection Status
                 </div>
 
@@ -200,7 +200,7 @@ export default function LibraryPage() {
               Your Library Is Empty
             </h2>
 
-            <p className="mt-4 max-w-xl text-zinc-500">
+            <p className="mt-4 max-w-xl text-zinc-300">
               Save chapters while reading
               and build your own collection.
             </p>
@@ -214,7 +214,7 @@ export default function LibraryPage() {
           </section>
         ) : (
           <section className="mx-auto max-w-7xl px-6 py-16">
-            <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
               {items.map((item) => (
                 <div
                   key={item.id}
@@ -252,7 +252,7 @@ export default function LibraryPage() {
                         "?"}
                     </div>
 
-                    <h2 className="text-2xl font-bold">
+                    <h2 className="text-xl font-bold">
                       {item.chapter
                         ?.title ??
                         "Unknown Chapter"}

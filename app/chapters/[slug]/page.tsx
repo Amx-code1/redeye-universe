@@ -35,8 +35,7 @@ export async function generateMetadata({
       ? `${chapter.title} | Red-Eye Universe`
       : "Chapter | Red-Eye Universe",
 
-    description:
-      "Read the next chapter of the Red-Eye Universe.",
+    description: "Read the next chapter of the Red-Eye Universe.",
   };
 }
 
@@ -57,26 +56,24 @@ export default async function ChapterPage({
     notFound();
   }
 
+  const words = chapter.content?.trim().split(/\s+/).length ?? 0;
+
+  const readingTime = Math.max(1, Math.ceil(words / 200));
+
   const { data: allChapters } = await supabase
     .from("chapters")
-    .select("*")
+    .select("id,title,slug,chapter_number")
     .order("chapter_number", {
       ascending: true,
     });
 
-  const currentIndex =
-    allChapters?.findIndex(
-      (c) => c.slug === slug
-    ) ?? -1;
+  const currentIndex = allChapters?.findIndex((c) => c.slug === slug) ?? -1;
 
   const previousChapter =
-    currentIndex > 0
-      ? allChapters?.[currentIndex - 1]
-      : null;
+    currentIndex > 0 ? allChapters?.[currentIndex - 1] : null;
 
   const nextChapter =
-    currentIndex <
-    (allChapters?.length ?? 0) - 1
+    currentIndex < (allChapters?.length ?? 0) - 1
       ? allChapters?.[currentIndex + 1]
       : null;
 
@@ -84,11 +81,9 @@ export default async function ChapterPage({
     <>
       <ReadingProgress />
 
-      <ProgressSaver
-        chapterId={chapter.id}
-      />
+      <ProgressSaver chapterId={chapter.id} />
 
-      <main className="min-h-screen bg-black text-white">
+      <div className="min-h-screen bg-black text-white">
         {/* HERO */}
 
         <section className="relative overflow-hidden border-b border-red-900/20">
@@ -130,19 +125,34 @@ export default async function ChapterPage({
               </div>
             </div>
 
+            {chapter.cover_image && (
+              <div className="mb-10 overflow-hidden rounded-[32px] border border-red-900/20">
+                <img
+                  src={chapter.cover_image}
+                  alt={chapter.title}
+                  className="h-[260px] md:h-[380px] w-full object-cover"
+                />
+              </div>
+            )}
+
             <h1 className="mt-8 text-5xl font-black md:text-7xl">
               {chapter.title}
             </h1>
 
-            <div className="mt-8 flex flex-wrap gap-6 text-zinc-500">
+            <div className="mt-8 flex flex-wrap gap-6 text-zinc-300">
               <div className="flex items-center gap-2">
                 <BookOpen size={18} />
                 Story Chapter
               </div>
 
               <div className="flex items-center gap-2">
+                <BookOpen size={18} />
+                {words.toLocaleString()} words
+              </div>
+
+              <div className="flex items-center gap-2">
                 <Clock3 size={18} />
-                5-10 Min Read
+                {readingTime} min read
               </div>
 
               <div className="flex items-center gap-2">
@@ -152,9 +162,7 @@ export default async function ChapterPage({
             </div>
 
             <div className="mt-10">
-              <LibraryButton
-                chapterId={chapter.id}
-              />
+              <LibraryButton chapterId={chapter.id} />
             </div>
           </div>
         </section>
@@ -176,14 +184,16 @@ export default async function ChapterPage({
             >
               <div
                 className="
-                  prose
-                  prose-invert
-                  max-w-none
-                  text-lg
-                  leading-10
-                  text-zinc-200
-                  whitespace-pre-wrap
-                "
+prose
+prose-invert
+max-w-none
+text-base
+md:text-lg
+leading-8
+md:leading-10
+text-zinc-200
+whitespace-pre-wrap
+"
               >
                 {chapter.content}
               </div>
@@ -194,15 +204,11 @@ export default async function ChapterPage({
             <div className="my-16 rounded-[32px] border border-red-900/20 bg-zinc-950/80 p-10 text-center backdrop-blur-xl">
               <Sparkles className="mx-auto mb-4 text-red-500" />
 
-              <h3 className="text-2xl font-bold">
-                Enjoying The Story?
-              </h3>
+              <h3 className="text-xl font-bold">Enjoying The Story?</h3>
 
-              <p className="mt-4 text-zinc-500">
-                Save your progress, add this
-                chapter to your library, and
-                continue exploring the Red-Eye
-                Universe.
+              <p className="mt-4 text-zinc-300">
+                Save your progress, add this chapter to your library, and
+                continue exploring the Red-Eye Universe.
               </p>
             </div>
 
@@ -230,15 +236,14 @@ export default async function ChapterPage({
                     <ArrowLeft size={20} />
 
                     <div>
-                      <div className="text-xs text-zinc-500">
-                        Previous
-                      </div>
+                      <div className="text-xs text-zinc-300">Previous</div>
 
                       <div className="font-semibold">
-                        Chapter{" "}
-                        {
-                          previousChapter.chapter_number
-                        }
+                        Chapter {previousChapter.chapter_number}
+                      </div>
+
+                      <div className="mt-1 text-sm text-zinc-400">
+                        {previousChapter.title}
                       </div>
                     </div>
                   </Link>
@@ -283,15 +288,14 @@ export default async function ChapterPage({
                     "
                   >
                     <div className="text-right">
-                      <div className="text-xs text-zinc-500">
-                        Next
-                      </div>
+                      <div className="text-xs text-zinc-300">Next</div>
 
                       <div className="font-semibold">
-                        Chapter{" "}
-                        {
-                          nextChapter.chapter_number
-                        }
+                        Chapter {nextChapter.chapter_number}
+                      </div>
+
+                      <div className="mt-1 text-sm text-zinc-400">
+                        {nextChapter.title}
                       </div>
                     </div>
 
@@ -303,14 +307,12 @@ export default async function ChapterPage({
 
             {/* COMMENTS */}
 
-            <div className="mt-24">
-              <CommentSection
-                chapterId={chapter.id}
-              />
+            <div className="mt-20">
+              <CommentSection chapterId={chapter.id} />
             </div>
           </div>
         </section>
-      </main>
+      </div>
     </>
   );
 }

@@ -112,7 +112,7 @@
 //                 className="
 //       font-title
 //       text-3xl
-//       tracking-[0.35em]
+//       tracking-[0.2em]
 //       text-transparent
 //       bg-clip-text
 //       bg-gradient-to-b
@@ -130,7 +130,7 @@
 
 //         {/* Desktop Navigation */}
 
-//         <div className="hidden items-center gap-8 md:flex">
+//         <div className="hidden items-center gap-5 md:flex">
 //           <NavLink href="/chapters" label="Chapters" pathname={pathname} />
 
 //           <NavLink href="/characters" label="Characters" pathname={pathname} />
@@ -217,7 +217,7 @@
 //         md:hidden
 //       "
 //           >
-//             <div className="flex h-full flex-col items-center justify-center gap-8">
+//             <div className="flex h-full flex-col items-center justify-center gap-5">
 //               <button
 //                 onClick={() => setMenuOpen(false)}
 //                 className="

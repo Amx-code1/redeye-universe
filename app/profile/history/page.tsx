@@ -200,7 +200,7 @@ export default function ReadingHistoryPage() {
                               "Unknown Chapter"}
                           </h2>
 
-                          <div className="mt-4 flex flex-wrap gap-4 text-sm text-zinc-500">
+                          <div className="mt-4 flex flex-wrap gap-4 text-sm text-zinc-300">
                             <div className="flex items-center gap-2">
                               <Clock3
                                 size={16}
@@ -279,7 +279,7 @@ function StatCard({
 }) {
   return (
     <div className="rounded-2xl border border-red-900/20 bg-zinc-900 p-6">
-      <div className="text-sm uppercase tracking-widest text-zinc-500">
+      <div className="text-sm uppercase tracking-widest text-zinc-300">
         {title}
       </div>
 
@@ -620,11 +620,11 @@ function StatCard({
 //                           ?.chapter_number ?? "?"}
 //                       </div>
 
-//                       <h2 className="text-2xl font-bold">
+//                       <h2 className="text-xl font-bold">
 //                         {item.chapters?.title}
 //                       </h2>
 
-//                       <div className="mt-4 flex flex-wrap gap-4 text-sm text-zinc-500">
+//                       <div className="mt-4 flex flex-wrap gap-4 text-sm text-zinc-300">
 //                         <div className="flex items-center gap-2">
 //                           <Clock3 size={16} />
 //                           Last Read:{" "}
@@ -688,7 +688,7 @@ function StatCard({
 // }) {
 //   return (
 //     <div className="rounded-2xl border border-red-900/20 bg-zinc-900 p-6">
-//       <div className="text-sm uppercase tracking-widest text-zinc-500">
+//       <div className="text-sm uppercase tracking-widest text-zinc-300">
 //         {title}
 //       </div>
 

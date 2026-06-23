@@ -147,7 +147,7 @@ export default function UniverseTimeline() {
                   relative
                   grid
                   items-center
-                  gap-8
+                  gap-5
                   lg:grid-cols-2
                 "
                 >

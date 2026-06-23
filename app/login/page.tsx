@@ -122,7 +122,7 @@ export default function LoginPage() {
           <div className="relative">
             <Mail
               size={18}
-              className="absolute left-4 top-4 text-zinc-500"
+              className="absolute left-4 top-4 text-zinc-300"
             />
 
             <input
@@ -139,7 +139,7 @@ export default function LoginPage() {
           <div className="relative">
             <Lock
               size={18}
-              className="absolute left-4 top-4 text-zinc-500"
+              className="absolute left-4 top-4 text-zinc-300"
             />
 
             <input
@@ -190,7 +190,7 @@ export default function LoginPage() {
 
         <div className="my-8 flex items-center">
           <div className="h-px flex-1 bg-zinc-800" />
-          <span className="px-4 text-sm text-zinc-500">
+          <span className="px-4 text-sm text-zinc-300">
             OR
           </span>
           <div className="h-px flex-1 bg-zinc-800" />
@@ -214,7 +214,7 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <div className="mt-8 text-center text-sm text-zinc-500">
+        <div className="mt-8 text-center text-sm text-zinc-300">
           No account?{" "}
           <Link
             href="/register"

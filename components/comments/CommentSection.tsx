@@ -157,7 +157,7 @@ export default function CommentSection({ chapterId }: { chapterId: string }) {
                 <div>
                   <p className="font-bold text-red-400">@{comment.profiles?.username || "reader"}</p>
 
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-xs text-zinc-300">
                     {new Date(comment.created_at).toLocaleString()}
                   </p>
                 </div>

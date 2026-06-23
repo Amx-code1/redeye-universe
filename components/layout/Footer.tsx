@@ -158,7 +158,7 @@ export default function Footer() {
                 Terms of Service
               </Link>
 
-              <div className="mt-2 flex items-center gap-2 text-sm text-zinc-500">
+              <div className="mt-2 flex items-center gap-2 text-sm text-zinc-300">
                 <Shield className="h-4 w-4 text-green-500" />
                 Secure Authentication
               </div>
@@ -168,7 +168,7 @@ export default function Footer() {
 
         {/* Newsletter */}
 
-        <div className="mt-24 rounded-[36px] border border-red-900/20 bg-zinc-950 p-10 text-center">
+        <div className="container mx-auto px-4 py-8 rounded-[36px] border border-red-900/20 bg-zinc-950 p-10 text-center">
           <Sparkles className="mx-auto h-8 w-8 text-red-400" />
 
           <h3 className="mt-4 text-4xl font-black">
@@ -207,7 +207,7 @@ export default function Footer() {
         {/* Quote */}
 
         <div className="mt-20 border-t border-zinc-800 pt-12 text-center">
-          <p className="mx-auto max-w-4xl text-xl italic text-zinc-500">
+          <p className="mx-auto max-w-4xl text-xl italic text-zinc-300">
             "The world was not destroyed by monsters.
             It was reshaped by power."
           </p>
@@ -215,7 +215,7 @@ export default function Footer() {
 
         {/* Bottom */}
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-zinc-800 pt-8 text-sm text-zinc-500 md:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-zinc-800 pt-8 text-sm text-zinc-300 md:flex-row">
           <div>
             © 2026 Red-Eye Universe. All Rights Reserved.
           </div>

@@ -98,7 +98,7 @@ export default function LatestChapters() {
         {/* Loading */}
 
         {loading && (
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-3">
             {[...Array(3)].map((_, i) => (
               <div
                 key={i}
@@ -116,7 +116,7 @@ export default function LatestChapters() {
         {/* Cards */}
 
         {!loading && (
-          <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
 
             {chapters.map((chapter, index) => (
               <motion.div
@@ -212,7 +212,7 @@ export default function LatestChapters() {
                       <h3
                         className="
                         line-clamp-2
-                        text-2xl
+                        text-xl
                         font-bold
                         text-white
                         transition
@@ -234,7 +234,7 @@ export default function LatestChapters() {
                         items-center
                         gap-4
                         text-sm
-                        text-zinc-500
+                        text-zinc-300
                       "
                       >
                         <div className="flex items-center gap-2">

@@ -182,7 +182,7 @@ export default function CrystalSystem() {
 
         {/* Crystal Types */}
 
-        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
 
           {crystals.map((crystal, index) => {
             const Icon = crystal.icon;

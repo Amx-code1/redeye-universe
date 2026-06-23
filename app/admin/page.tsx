@@ -185,7 +185,7 @@ export default function AdminPage() {
               </p>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-3">
+            <div className="grid gap-5 md:grid-cols-3">
               {adminCards.map((card) => {
                 const Icon = card.icon;
 
@@ -200,7 +200,7 @@ export default function AdminPage() {
                       className="mb-6 text-red-500"
                     />
 
-                    <h3 className="text-2xl font-bold">
+                    <h3 className="text-xl font-bold">
                       {card.title}
                     </h3>
 
@@ -277,7 +277,7 @@ function StatCard({
         className="mb-4 text-red-500"
       />
 
-      <div className="text-sm uppercase tracking-widest text-zinc-500">
+      <div className="text-sm uppercase tracking-widest text-zinc-300">
         {title}
       </div>
 
@@ -304,7 +304,7 @@ function ActivityCard({
         className="mb-4 text-red-500"
       />
 
-      <div className="text-sm uppercase tracking-widest text-zinc-500">
+      <div className="text-sm uppercase tracking-widest text-zinc-300">
         {title}
       </div>
 

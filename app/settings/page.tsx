@@ -342,7 +342,7 @@ export default function SettingsPage() {
             className="mt-6 w-full rounded-xl bg-zinc-900 p-4"
           />
 
-          <div className="mt-2 text-right text-zinc-500">
+          <div className="mt-2 text-right text-zinc-300">
             {(profile.bio ?? "").length}/250
           </div>
 

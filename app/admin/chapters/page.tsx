@@ -153,11 +153,11 @@ export default function AdminChaptersPage() {
                         Chapter {chapter.chapter_number}
                       </p>
 
-                      <h2 className="text-2xl font-bold">
+                      <h2 className="text-xl font-bold">
                         {chapter.title}
                       </h2>
 
-                      <p className="text-zinc-500">
+                      <p className="text-zinc-300">
                         {chapter.slug}
                       </p>
                     </div>

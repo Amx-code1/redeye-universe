@@ -26,7 +26,7 @@ export async function generateMetadata({
 
   const { data: character } = await supabase
     .from("characters")
-    .select("name,title")
+    .select("id,name,slug,avatar_url,title")
     .eq("id", id)
     .single();
 
@@ -34,9 +34,7 @@ export async function generateMetadata({
     title: character
       ? `${character.name} | Red-Eye Universe`
       : "Character | Red-Eye Universe",
-    description:
-      character?.title ||
-      "Character profile from the Red-Eye Universe.",
+    description: `${character?.name} - ${character?.title}. Explore lore, abilities, faction, and powers in the Red-Eye Universe.`,
   };
 }
 
@@ -57,11 +55,35 @@ export default async function CharacterPage({
     notFound();
   }
 
+  const { data: relatedCharacters } = await supabase
+  .from("characters")
+  .select("id,name,slug,avatar_url,title")
+  .neq("id", character.id)
+  .limit(3);
+
   return (
-    <main className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white">
       {/* HERO */}
 
       <section className="relative overflow-hidden border-b border-red-900/20">
+        {character.banner_url && (
+          <>
+            <img
+              src={character.banner_url}
+              alt={character.name}
+              className="
+          absolute
+          inset-0
+          h-full
+          w-full
+          object-cover
+          opacity-25
+        "
+            />
+
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/70 to-black" />
+          </>
+        )}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,#7f1d1d_0%,#000000_75%)] opacity-40" />
 
         <div className="absolute left-1/2 top-0 h-[900px] w-[900px] -translate-x-1/2 rounded-full bg-red-600/10 blur-[220px]" />
@@ -102,7 +124,8 @@ export default async function CharacterPage({
                   alt={character.name}
                   className="
                     relative
-                    h-[650px]
+                    h-[420px]
+                    md:h-[650px]
                     w-full
                     rounded-[36px]
                     border
@@ -148,17 +171,15 @@ export default async function CharacterPage({
                 )}
               </div>
 
-              <div className="text-sm uppercase tracking-[0.35em] text-red-400">
+              <div className="text-sm uppercase tracking-[0.2em] text-red-400">
                 Red-Eye Character Archive
               </div>
 
-              <h1 className="mt-4 bg-gradient-to-r from-red-300 via-red-500 to-red-700 bg-clip-text text-6xl font-black text-transparent md:text-8xl">
+              <h1 className="mt-4 bg-gradient-to-r from-red-300 via-red-500 to-red-700 bg-clip-text text-5xl md:text-7xl xl:text-8xl font-black text-transparent ">
                 {character.name}
               </h1>
 
-              <p className="mt-5 text-2xl text-zinc-400">
-                {character.title}
-              </p>
+              <p className="mt-5 text-xl text-zinc-400">{character.title}</p>
 
               {character.quote && (
                 <div className="mt-10 rounded-3xl border border-red-900/20 bg-zinc-950/80 p-8 backdrop-blur-xl">
@@ -207,16 +228,14 @@ export default async function CharacterPage({
       {/* LORE SECTION */}
 
       <section className="mx-auto max-w-7xl px-6 pb-10">
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="grid gap-5 lg:grid-cols-3">
           <div className="rounded-[32px] border border-red-900/20 bg-zinc-950/80 p-8 backdrop-blur-xl">
             <div className="mb-4 flex items-center gap-3 text-red-500">
               <Swords size={20} />
               <span className="font-semibold">Combat Class</span>
             </div>
 
-            <p className="text-zinc-300">
-              {character.rank || "Unknown"}
-            </p>
+            <p className="text-zinc-300">{character.rank || "Unknown"}</p>
           </div>
 
           <div className="rounded-[32px] border border-red-900/20 bg-zinc-950/80 p-8 backdrop-blur-xl">
@@ -225,9 +244,7 @@ export default async function CharacterPage({
               <span className="font-semibold">Affiliation</span>
             </div>
 
-            <p className="text-zinc-300">
-              {character.faction || "Unknown"}
-            </p>
+            <p className="text-zinc-300">{character.faction || "Unknown"}</p>
           </div>
 
           <div className="rounded-[32px] border border-red-900/20 bg-zinc-950/80 p-8 backdrop-blur-xl">
@@ -247,13 +264,10 @@ export default async function CharacterPage({
 
       <section className="mx-auto max-w-7xl px-6 pb-10">
         <div className="rounded-[32px] border border-red-900/20 bg-zinc-950/80 p-10 backdrop-blur-xl">
-          <h2 className="mb-8 text-4xl font-black text-red-500">
-            Biography
-          </h2>
+          <h2 className="mb-8 text-4xl font-black text-red-500">Biography</h2>
 
           <p className="whitespace-pre-wrap text-lg leading-9 text-zinc-300">
-            {character.description ||
-              "No biography has been recorded yet."}
+            {character.description || "No biography has been recorded yet."}
           </p>
         </div>
       </section>
@@ -273,7 +287,63 @@ export default async function CharacterPage({
           </div>
         </section>
       )}
-    </main>
+      {relatedCharacters && relatedCharacters.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 pb-24">
+          <h2 className="mb-10 text-4xl font-black text-red-500">
+            Related Characters
+          </h2>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {relatedCharacters.map((related) => (
+              <Link
+                key={related.id}
+                href={`/characters/${related.slug}`}
+                className="
+              overflow-hidden
+              rounded-[28px]
+              border
+              border-red-900/20
+              bg-zinc-950/80
+              transition
+              hover:border-red-500/40
+            "
+              >
+                {related.avatar_url ? (
+                  <img
+                    src={related.avatar_url}
+                    alt={related.name}
+                    className="
+                  h-72
+                  w-full
+                  object-cover
+                "
+                  />
+                ) : (
+                  <div
+                    className="
+                  flex
+                  h-72
+                  items-center
+                  justify-center
+                  bg-zinc-900
+                  text-6xl
+                "
+                  >
+                    👤
+                  </div>
+                )}
+
+                <div className="p-6">
+                  <h3 className="text-xl font-bold">{related.name}</h3>
+
+                  <p className="mt-2 text-zinc-300">{related.title}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
   );
 }
 
@@ -288,17 +358,13 @@ function StatCard({
 }) {
   return (
     <div className="rounded-[28px] border border-red-900/20 bg-zinc-950/80 p-8 backdrop-blur-xl">
-      <div className="mb-4 text-red-500">
-        {icon}
-      </div>
+      <div className="mb-4 text-red-500">{icon}</div>
 
-      <div className="text-xs uppercase tracking-[0.25em] text-zinc-500">
+      <div className="text-xs uppercase tracking-[0.25em] text-zinc-300">
         {title}
       </div>
 
-      <div className="mt-3 text-2xl font-bold">
-        {value}
-      </div>
+      <div className="mt-3 text-xl font-bold">{value}</div>
     </div>
   );
 }

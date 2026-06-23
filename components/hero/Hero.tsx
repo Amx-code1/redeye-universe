@@ -22,7 +22,7 @@ export default function Hero() {
 
       {/* Dark Overlay */}
 
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-black/70" />
 
       {/* Red Atmosphere */}
 
@@ -56,11 +56,20 @@ export default function Hero() {
           lg:block
         "
       >
+        <div
+          className="
+  absolute
+  inset-0
+  rounded-full
+  bg-red-600/10
+  blur-[120px]
+"
+        />
         <Image
           src="/world/agastha-crystal.webp"
           alt="Agastha Crystal"
-          width={550}
-          height={550}
+          width={650}
+          height={650}
           className="
             drop-shadow-[0_0_100px_rgba(239,68,68,0.8)]
           "
@@ -97,7 +106,19 @@ export default function Hero() {
           px-6
         "
       >
-        <div className="max-w-3xl">
+        <div
+          className="
+  max-w-3xl
+  rounded-[40px]
+  border
+  border-red-500/10
+  bg-black/20
+  p-8
+  md:p-12
+  backdrop-blur-xl
+  shadow-[0_0_80px_rgba(0,0,0,0.4)]
+"
+        >
           {/* Badge */}
 
           <motion.div
@@ -145,13 +166,13 @@ export default function Hero() {
             }}
             className="
               font-title
-              text-6xl
+              text-5xl
               font-black
               uppercase
               leading-none
               tracking-[0.15em]
-              md:text-8xl
-              xl:text-[8rem]
+              md:text-7xl
+              xl:text-[7rem]
             "
           >
             <span
@@ -188,14 +209,13 @@ export default function Hero() {
               max-w-2xl
               text-lg
               leading-relaxed
-              text-zinc-300
-              md:text-2xl
+              text-zinc-200
+              md:text-xl
             "
           >
-            Power born from Agastha Crystals.
-            Kingdoms consumed by fate.
-            Ancient bloodlines, forbidden abilities,
-            and a world standing on the edge of collapse.
+            Power born from Agastha Crystals. Kingdoms consumed by fate. Ancient
+            bloodlines, forbidden abilities, and a world standing on the edge of
+            collapse.
           </motion.p>
 
           {/* Buttons */}
@@ -235,7 +255,7 @@ export default function Hero() {
                 rounded-2xl
                 border
                 border-red-500/30
-                bg-black/40
+                bg-zinc-950/80
                 px-8
                 py-4
                 font-bold
@@ -287,28 +307,44 @@ function StatCard({
 }) {
   return (
     <div
-      className="
-        rounded-3xl
-        border
-        border-red-500/10
-        bg-black/40
-        p-6
-        backdrop-blur-xl
-        transition
-        hover:border-red-500/30
-        hover:shadow-[0_0_30px_rgba(239,68,68,0.2)]
-      "
-    >
-      <div className="mb-4 text-red-500">
-        {icon}
-      </div>
+  className="
+    rounded-3xl
+    border
+    border-red-500/10
+    bg-zinc-950/80
+    p-7
+    backdrop-blur-xl
+    transition-all
+    duration-500
+    hover:-translate-y-2
+    hover:border-red-500/40
+    hover:shadow-[0_0_40px_rgba(239,68,68,0.15)]
+  "
+>
+      <div className="mb-4 text-red-500">{icon}</div>
 
-      <div className="text-3xl font-bold">
+      <div
+        className="text-4xl
+font-black
+text-white "
+      >
         {title}
       </div>
 
-      <div className="text-zinc-400">
-        {subtitle}
+      <div className="text-zinc-300">{subtitle}</div>
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        <span className="rounded-full border border-red-500/20 bg-red-950/20 px-4 py-2 text-sm text-red-300">
+          Agastha Crystals
+        </span>
+
+        <span className="rounded-full border border-red-500/20 bg-red-950/20 px-4 py-2 text-sm text-red-300">
+          Dark Fantasy
+        </span>
+
+        <span className="rounded-full border border-red-500/20 bg-red-950/20 px-4 py-2 text-sm text-red-300">
+          Ancient Bloodlines
+        </span>
       </div>
     </div>
   );

@@ -231,7 +231,7 @@ export default function ProfilePage() {
                   {profile.bio || "No biography added yet."}
                 </p>
 
-                <div className="mt-8 flex flex-wrap gap-4 text-zinc-500">
+                <div className="mt-8 flex flex-wrap gap-4 text-zinc-300">
                   <span>Age: {profile.age || "Unknown"}</span>
 
                   <span>Gender: {profile.gender || "Unknown"}</span>
@@ -301,7 +301,7 @@ export default function ProfilePage() {
         {/* MAIN DASHBOARD */}
 
         <section className="mx-auto max-w-7xl px-6 pb-20">
-          <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+          <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
             {/* LEFT */}
 
             <div className="space-y-8">
@@ -322,9 +322,9 @@ export default function ProfilePage() {
                 />
               ) : (
                 <div className="rounded-3xl border border-red-900/20 bg-zinc-950/80 p-8">
-                  <h2 className="text-2xl font-bold">Continue Reading</h2>
+                  <h2 className="text-xl font-bold">Continue Reading</h2>
 
-                  <p className="mt-3 text-zinc-500">
+                  <p className="mt-3 text-zinc-300">
                     Start reading your first chapter to track progress.
                   </p>
                 </div>
@@ -345,7 +345,7 @@ export default function ProfilePage() {
                 <div className="mb-6 flex items-center gap-3">
                   <Sparkles className="text-red-500" />
 
-                  <h2 className="text-2xl font-bold">Achievements</h2>
+                  <h2 className="text-xl font-bold">Achievements</h2>
                 </div>
 
                 <div className="space-y-4">
@@ -369,7 +369,7 @@ export default function ProfilePage() {
               </div>
 
               <div className="rounded-3xl border border-red-900/20 bg-zinc-950/80 p-8">
-                <h2 className="mb-6 text-2xl font-bold">Quick Access</h2>
+                <h2 className="mb-6 text-xl font-bold">Quick Access</h2>
 
                 <div className="flex flex-col gap-3">
                   <Link
@@ -436,7 +436,7 @@ function PremiumStatCard({
     <div className="rounded-3xl border border-red-900/20 bg-zinc-950/80 p-8 backdrop-blur-xl">
       <div className="mb-4 text-red-500">{icon}</div>
 
-      <div className="text-sm uppercase tracking-wider text-zinc-500">
+      <div className="text-sm uppercase tracking-wider text-zinc-300">
         {title}
       </div>
 

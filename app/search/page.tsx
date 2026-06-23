@@ -136,7 +136,7 @@ export default function SearchPage() {
             <div className="relative flex-1">
               <Search
                 size={20}
-                className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500"
+                className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-300"
               />
 
               <input
@@ -277,7 +277,7 @@ export default function SearchPage() {
               </h2>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {characters.map(
                 (character) => (
                   <Link
@@ -314,7 +314,7 @@ export default function SearchPage() {
                       </div>
 
                       <div className="p-6">
-                        <h3 className="text-2xl font-bold text-red-500">
+                        <h3 className="text-xl font-bold text-red-500">
                           {
                             character.name
                           }

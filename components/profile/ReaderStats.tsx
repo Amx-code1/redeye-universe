@@ -15,7 +15,7 @@ export default function ReaderStats({
 }: Props) {
   return (
     <div className="rounded-2xl bg-zinc-900 p-6">
-      <h2 className="mb-6 text-2xl font-bold">Reader Stats</h2>
+      <h2 className="mb-6 text-xl font-bold">Reader Stats</h2>
 
       <div className="grid grid-cols-4 gap-4">
         <div className="rounded-xl bg-black p-4 text-center">

@@ -74,7 +74,7 @@ export default function CommunitySection() {
 
         {/* Community Cards */}
 
-        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
 
           <CommunityCard
             icon={<MessageSquare size={28} />}
@@ -135,7 +135,7 @@ export default function CommunitySection() {
             once: true,
           }}
           className="
-          mt-24
+          container mx-auto px-4 py-8
           rounded-[40px]
           border
           border-red-900/20
@@ -252,7 +252,7 @@ function CommunityCard({
           {icon}
         </div>
 
-        <h3 className="mt-6 text-2xl font-bold text-white">
+        <h3 className="mt-6 text-xl font-bold text-white">
           {title}
         </h3>
 

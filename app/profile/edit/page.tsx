@@ -412,7 +412,7 @@ export default function EditProfilePage() {
                   className="w-full rounded-xl bg-black p-4 ring-1 ring-zinc-800 outline-none focus:ring-red-500"
                 />
 
-                <div className="mt-2 text-right text-sm text-zinc-500">
+                <div className="mt-2 text-right text-sm text-zinc-300">
                   {(profile.bio || "").length}/500
                 </div>
               </div>
