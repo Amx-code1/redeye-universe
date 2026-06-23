@@ -25,135 +25,64 @@ export default function NewThreadPage() {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-  //   e.preventDefault();
-
-  //   try {
-  //     setLoading(true);
-
-  //     const {
-  //       data: { user },
-  //       error: userError,
-  //     } = await supabase.auth.getUser();
-
-  //     if (userError || !user) {
-  //       toast.error("Please login first.");
-  //       router.push("/login");
-  //       return;
-  //     }
-
-  //     if (title.trim().length < 5) {
-  //       toast.error("Title must be at least 5 characters.");
-  //       return;
-  //     }
-
-  //     if (content.trim().length < 20) {
-  //       toast.error("Content must be at least 20 characters.");
-  //       return;
-  //     }
-
-  //     // const { error } = await supabase
-  //     //   .from("community_threads")
-  //     //   .insert({
-  //     //     user_id: user.id,
-  //     //     title: title.trim(),
-  //     //     category,
-  //     //     content: content.trim(),
-  //     //   });
-
-  //     // if (error) throw error;
-
-  //     const { data, error } = await supabase
-  //       .from("community_threads")
-  //       .insert({
-  //         user_id: user.id,
-  //         title: title.trim(),
-  //         category,
-  //         content: content.trim(),
-  //       })
-  //       .select();
-
-  //     console.log("THREAD DATA", data);
-  //     console.log("THREAD ERROR", error);
-
-  //     if (error) {
-  //       toast.error(error.message);
-  //       console.error(error);
-  //       return;
-  //     }
-
-  //     toast.success("Thread created successfully!");
-
-  //     router.push("/community");
-  //     router.refresh();
-  //   } catch (error) {
-  //     console.error(error);
-
-  //     toast.error("Failed to create thread. Please try again.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
-
   async function handleSubmit(
-  e: React.FormEvent<HTMLFormElement>
-) {
-  e.preventDefault();
+    e: React.FormEvent<HTMLFormElement>
+  ) {
+    e.preventDefault();
 
-  console.log("STEP 1");
+    try {
+      setLoading(true);
 
-  try {
-    setLoading(true);
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
 
-    console.log("STEP 2");
+      if (userError || !user) {
+        toast.error("Please login first.");
+        router.push("/login");
+        return;
+      }
 
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+      if (title.trim().length < 5) {
+        toast.error(
+          "Title must be at least 5 characters."
+        );
+        return;
+      }
 
-    console.log("USER", user);
-    console.log("USER ERROR", userError);
+      if (content.trim().length < 20) {
+        toast.error(
+          "Content must be at least 20 characters."
+        );
+        return;
+      }
 
-    if (!user) {
-      toast.error("No user found");
-      return;
-    }
-
-    console.log("STEP 3");
-
-    const { data, error } =
-      await supabase
+      const { error } = await supabase
         .from("community_threads")
         .insert({
           user_id: user.id,
-          title,
+          title: title.trim(),
           category,
-          content,
-        })
-        .select();
+          content: content.trim(),
+        });
 
-    console.log("THREAD DATA", data);
-    console.log("THREAD ERROR", error);
+      if (error) throw error;
 
-    if (error) {
-      toast.error(error.message);
-      return;
+      toast.success("Thread created successfully!");
+
+      router.push("/community");
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+
+      toast.error(
+        "Failed to create thread. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
-
-    console.log("STEP 4");
-
-    toast.success("Thread created");
-
-    router.push("/community");
-  } catch (err) {
-    console.error("CATCH", err);
-
-    toast.error("Something failed");
-  } finally {
-    setLoading(false);
   }
-}
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -214,7 +143,8 @@ export default function NewThreadPage() {
           </h1>
 
           <p className="mt-4 max-w-2xl text-lg text-zinc-300">
-            Share theories, discuss chapters, debate characters, and explore the
+            Share theories, discuss chapters,
+            debate characters, and explore the
             mysteries of the Red-Eye Universe.
           </p>
         </div>
@@ -242,7 +172,9 @@ export default function NewThreadPage() {
             <input
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) =>
+                setTitle(e.target.value)
+              }
               placeholder="Example: Is Viktor Still Alive?"
               className="
                 w-full
@@ -271,7 +203,9 @@ export default function NewThreadPage() {
 
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) =>
+                setCategory(e.target.value)
+              }
               className="
                 w-full
                 rounded-2xl
@@ -286,7 +220,10 @@ export default function NewThreadPage() {
               "
             >
               {categories.map((item) => (
-                <option key={item} value={item}>
+                <option
+                  key={item}
+                  value={item}
+                >
                   {item}
                 </option>
               ))}
@@ -302,7 +239,9 @@ export default function NewThreadPage() {
 
             <textarea
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e) =>
+                setContent(e.target.value)
+              }
               rows={12}
               placeholder="Share your thoughts..."
               className="
@@ -341,7 +280,9 @@ export default function NewThreadPage() {
                 disabled:opacity-50
               "
             >
-              {loading ? "Creating Thread..." : "Create Thread"}
+              {loading
+                ? "Creating Thread..."
+                : "Create Thread"}
             </button>
 
             <Link
