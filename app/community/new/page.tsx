@@ -25,75 +25,135 @@ export default function NewThreadPage() {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  // async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  //   e.preventDefault();
 
-    try {
-      setLoading(true);
+  //   try {
+  //     setLoading(true);
 
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+  //     const {
+  //       data: { user },
+  //       error: userError,
+  //     } = await supabase.auth.getUser();
 
-      if (userError || !user) {
-        toast.error("Please login first.");
-        router.push("/login");
-        return;
-      }
+  //     if (userError || !user) {
+  //       toast.error("Please login first.");
+  //       router.push("/login");
+  //       return;
+  //     }
 
-      if (title.trim().length < 5) {
-        toast.error("Title must be at least 5 characters.");
-        return;
-      }
+  //     if (title.trim().length < 5) {
+  //       toast.error("Title must be at least 5 characters.");
+  //       return;
+  //     }
 
-      if (content.trim().length < 20) {
-        toast.error("Content must be at least 20 characters.");
-        return;
-      }
+  //     if (content.trim().length < 20) {
+  //       toast.error("Content must be at least 20 characters.");
+  //       return;
+  //     }
 
-      // const { error } = await supabase
-      //   .from("community_threads")
-      //   .insert({
-      //     user_id: user.id,
-      //     title: title.trim(),
-      //     category,
-      //     content: content.trim(),
-      //   });
+  //     // const { error } = await supabase
+  //     //   .from("community_threads")
+  //     //   .insert({
+  //     //     user_id: user.id,
+  //     //     title: title.trim(),
+  //     //     category,
+  //     //     content: content.trim(),
+  //     //   });
 
-      // if (error) throw error;
+  //     // if (error) throw error;
 
-      const { data, error } = await supabase
+  //     const { data, error } = await supabase
+  //       .from("community_threads")
+  //       .insert({
+  //         user_id: user.id,
+  //         title: title.trim(),
+  //         category,
+  //         content: content.trim(),
+  //       })
+  //       .select();
+
+  //     console.log("THREAD DATA", data);
+  //     console.log("THREAD ERROR", error);
+
+  //     if (error) {
+  //       toast.error(error.message);
+  //       console.error(error);
+  //       return;
+  //     }
+
+  //     toast.success("Thread created successfully!");
+
+  //     router.push("/community");
+  //     router.refresh();
+  //   } catch (error) {
+  //     console.error(error);
+
+  //     toast.error("Failed to create thread. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
+
+  async function handleSubmit(
+  e: React.FormEvent<HTMLFormElement>
+) {
+  e.preventDefault();
+
+  console.log("STEP 1");
+
+  try {
+    setLoading(true);
+
+    console.log("STEP 2");
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    console.log("USER", user);
+    console.log("USER ERROR", userError);
+
+    if (!user) {
+      toast.error("No user found");
+      return;
+    }
+
+    console.log("STEP 3");
+
+    const { data, error } =
+      await supabase
         .from("community_threads")
         .insert({
           user_id: user.id,
-          title: title.trim(),
+          title,
           category,
-          content: content.trim(),
+          content,
         })
         .select();
 
-      console.log("THREAD DATA", data);
-      console.log("THREAD ERROR", error);
+    console.log("THREAD DATA", data);
+    console.log("THREAD ERROR", error);
 
-      if (error) {
-        toast.error(error.message);
-        console.error(error);
-        return;
-      }
-
-      toast.success("Thread created successfully!");
-
-      router.push("/community");
-      router.refresh();
-    } catch (error) {
-      console.error(error);
-
-      toast.error("Failed to create thread. Please try again.");
-    } finally {
-      setLoading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
     }
+
+    console.log("STEP 4");
+
+    toast.success("Thread created");
+
+    router.push("/community");
+  } catch (err) {
+    console.error("CATCH", err);
+
+    toast.error("Something failed");
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <main className="min-h-screen bg-black text-white">
