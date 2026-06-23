@@ -40,8 +40,10 @@ export default function EditProfilePage() {
   async function loadProfile() {
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const user = session?.user;
 
       if (!user) {
         window.location.href = "/login";
@@ -86,9 +88,7 @@ export default function EditProfilePage() {
 
       const {
         data: { publicUrl },
-      } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(fileName);
+      } = supabase.storage.from("avatars").getPublicUrl(fileName);
 
       setProfile({
         ...profile,
@@ -128,9 +128,7 @@ export default function EditProfilePage() {
 
       const {
         data: { publicUrl },
-      } = supabase.storage
-        .from("banners")
-        .getPublicUrl(fileName);
+      } = supabase.storage.from("banners").getPublicUrl(fileName);
 
       setProfile({
         ...profile,
@@ -237,9 +235,7 @@ export default function EditProfilePage() {
 
               <div className="absolute bottom-5 right-5">
                 <label className="cursor-pointer rounded-xl bg-red-600 px-5 py-3 font-semibold hover:bg-red-700">
-                  {uploadingBanner
-                    ? "Uploading..."
-                    : "Upload Banner"}
+                  {uploadingBanner ? "Uploading..." : "Upload Banner"}
 
                   <input
                     hidden
@@ -356,21 +352,13 @@ export default function EditProfilePage() {
                     }
                     className="w-full rounded-xl bg-black p-4 ring-1 ring-zinc-800 outline-none focus:ring-red-500"
                   >
-                    <option value="">
-                      Select Gender
-                    </option>
+                    <option value="">Select Gender</option>
 
-                    <option value="Male">
-                      Male
-                    </option>
+                    <option value="Male">Male</option>
 
-                    <option value="Female">
-                      Female
-                    </option>
+                    <option value="Female">Female</option>
 
-                    <option value="Other">
-                      Other
-                    </option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
               </div>
@@ -424,9 +412,7 @@ export default function EditProfilePage() {
               >
                 <Save size={18} />
 
-                {saving
-                  ? "Saving..."
-                  : "Save Profile"}
+                {saving ? "Saving..." : "Save Profile"}
               </button>
             </div>
           </div>

@@ -30,8 +30,10 @@ export default function SettingsPage() {
   async function loadProfile() {
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+  data: { session },
+} = await supabase.auth.getSession();
+
+const user = session?.user;
 
       if (!user) {
         setLoading(false);
@@ -136,8 +138,10 @@ export default function SettingsPage() {
 
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+  data: { session },
+} = await supabase.auth.getSession();
+
+const user = session?.user;
 
       if (!user) {
         toast.error("Not authenticated");
@@ -172,8 +176,10 @@ export default function SettingsPage() {
 
   async function resetPassword() {
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  data: { session },
+} = await supabase.auth.getSession();
+
+const user = session?.user;
 
     if (!user?.email) {
       toast.error("Email not found");

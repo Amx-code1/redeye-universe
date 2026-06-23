@@ -21,8 +21,10 @@ export default function AdminRoute({
   async function checkAdmin() {
     try {
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const user = session?.user;
 
       if (!user) {
         router.replace("/login");

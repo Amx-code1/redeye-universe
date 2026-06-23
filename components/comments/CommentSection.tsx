@@ -31,8 +31,10 @@ export default function CommentSection({ chapterId }: { chapterId: string }) {
 
   async function loadUser() {
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  data: { session },
+} = await supabase.auth.getSession();
+
+const user = session?.user;
 
     setUser(user);
   }

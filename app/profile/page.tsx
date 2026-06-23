@@ -49,8 +49,10 @@ export default function ProfilePage() {
 
   async function loadProfile() {
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const user = session?.user;
 
     if (!user) {
       router.push("/login");
@@ -88,40 +90,74 @@ export default function ProfilePage() {
 
     setProfile(profileData);
 
-    const { data: comments } = await supabase
-      .from("comments")
-      .select("id")
-      .eq("user_id", user.id);
+    // const { data: comments } = await supabase
+    //   .from("comments")
+    //   .select("id")
+    //   .eq("user_id", user.id);
 
-    setCommentsCount(comments?.length || 0);
+    // setCommentsCount(comments?.length || 0);
 
-    const { count } = await supabase
-      .from("library")
-      .select("*", {
-        count: "exact",
-        head: true,
-      })
-      .eq("user_id", user.id);
+    // const { count } = await supabase
+    //   .from("library")
+    //   .select("*", {
+    //     count: "exact",
+    //     head: true,
+    //   })
+    //   .eq("user_id", user.id);
 
-    setSavedCount(count || 0);
+    // setSavedCount(count || 0);
 
-    const { data: progress } = await supabase
-      .from("reading_progress")
-      .select(
-        `
-          *,
-          chapters (
-            title,
-            slug
-          )
-        `,
+    // const { data: progress } = await supabase
+    //   .from("reading_progress")
+    //   .select(
+    //     `
+    //       *,
+    //       chapters (
+    //         title,
+    //         slug
+    //       )
+    //     `,
+    //   )
+    //   .eq("user_id", user.id)
+    //   .order("updated_at", {
+    //     ascending: false,
+    //   });
+
+    // setProgressData(progress || []);
+
+    const [commentsResult, libraryResult, progressResult] = await Promise.all([
+      supabase.from("comments").select("id").eq("user_id", user.id),
+
+      supabase
+        .from("library")
+        .select("*", {
+          count: "exact",
+          head: true,
+        })
+        .eq("user_id", user.id),
+
+      supabase
+        .from("reading_progress")
+        .select(
+          `
+      *,
+      chapters (
+        title,
+        slug
       )
-      .eq("user_id", user.id)
-      .order("updated_at", {
-        ascending: false,
-      });
+    `,
+        )
+        .eq("user_id", user.id)
+        .order("updated_at", {
+          ascending: false,
+        }),
+    ]);
 
-    setProgressData(progress || []);
+    setCommentsCount(commentsResult.data?.length || 0);
+
+    setSavedCount(libraryResult.count || 0);
+
+    setProgressData(progressResult.data || []);
   }
 
   if (error) {

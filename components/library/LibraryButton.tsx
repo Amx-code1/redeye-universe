@@ -4,14 +4,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import toast from "react-hot-toast";
 
-export default function LibraryButton({
-  chapterId,
-}: {
-  chapterId: string;
-}) {
+export default function LibraryButton({ chapterId }: { chapterId: string }) {
   const [saved, setSaved] = useState(false);
-  const [loading, setLoading] =
-    useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkSaved();
@@ -19,8 +14,10 @@ export default function LibraryButton({
 
   async function checkSaved() {
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    const user = session?.user;
 
     if (!user) {
       setLoading(false);
@@ -40,8 +37,10 @@ export default function LibraryButton({
 
   async function toggleLibrary() {
     const {
-      data: { user },
-    } = await supabase.auth.getUser();
+  data: { session },
+} = await supabase.auth.getSession();
+
+const user = session?.user;
 
     if (!user) {
       window.location.href = "/login";
@@ -57,12 +56,10 @@ export default function LibraryButton({
 
       setSaved(false);
     } else {
-      await supabase
-        .from("library")
-        .insert({
-          user_id: user.id,
-          chapter_id: chapterId,
-        });
+      await supabase.from("library").insert({
+        user_id: user.id,
+        chapter_id: chapterId,
+      });
 
       setSaved(true);
     }
@@ -75,9 +72,7 @@ export default function LibraryButton({
       onClick={toggleLibrary}
       className="rounded-xl bg-red-600 px-5 py-3 font-semibold transition hover:bg-red-700"
     >
-      {saved
-        ? "✓ Saved"
-        : "+ Save To Library"}
+      {saved ? "✓ Saved" : "+ Save To Library"}
     </button>
   );
 }

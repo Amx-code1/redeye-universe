@@ -7,13 +7,7 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Skeleton from "@/components/ui/Skeleton";
 import toast from "react-hot-toast";
 
-import {
-  BookOpen,
-  Trash2,
-  Library,
-  Sparkles,
-  ArrowRight,
-} from "lucide-react";
+import { BookOpen, Trash2, Library, Sparkles, ArrowRight } from "lucide-react";
 
 export default function LibraryPage() {
   const [items, setItems] = useState<any[]>([]);
@@ -29,21 +23,22 @@ export default function LibraryPage() {
       setLoading(true);
 
       const {
-        data: { user },
-      } = await supabase.auth.getUser();
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const user = session?.user;
 
       if (!user) {
         return;
       }
 
-      const { data: libraryData, error } =
-        await supabase
-          .from("library")
-          .select("*")
-          .eq("user_id", user.id)
-          .order("created_at", {
-            ascending: false,
-          });
+      const { data: libraryData, error } = await supabase
+        .from("library")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", {
+          ascending: false,
+        });
 
       if (error) {
         setError(error.message);
@@ -55,62 +50,37 @@ export default function LibraryPage() {
         return;
       }
 
-      const chapterIds = libraryData.map(
-        (item) => item.chapter_id
-      );
+      const chapterIds = libraryData.map((item) => item.chapter_id);
 
-      const { data: chapters } =
-        await supabase
-          .from("chapters")
-          .select(
-            "id,title,slug,chapter_number"
-          )
-          .in("id", chapterIds);
+      const { data: chapters } = await supabase
+        .from("chapters")
+        .select("id,title,slug,chapter_number")
+        .in("id", chapterIds);
 
-      const merged = libraryData.map(
-        (item) => ({
-          ...item,
-          chapter: chapters?.find(
-            (chapter) =>
-              chapter.id ===
-              item.chapter_id
-          ),
-        })
-      );
+      const merged = libraryData.map((item) => ({
+        ...item,
+        chapter: chapters?.find((chapter) => chapter.id === item.chapter_id),
+      }));
 
       setItems(merged);
     } catch {
-      toast.error(
-        "Failed to load library."
-      );
+      toast.error("Failed to load library.");
     } finally {
       setLoading(false);
     }
   }
 
-  async function removeFromLibrary(
-    id: string
-  ) {
-    const { error } =
-      await supabase
-        .from("library")
-        .delete()
-        .eq("id", id);
+  async function removeFromLibrary(id: string) {
+    const { error } = await supabase.from("library").delete().eq("id", id);
 
     if (error) {
       toast.error(error.message);
       return;
     }
 
-    setItems((prev) =>
-      prev.filter(
-        (item) => item.id !== id
-      )
-    );
+    setItems((prev) => prev.filter((item) => item.id !== id));
 
-    toast.success(
-      "Removed from library."
-    );
+    toast.success("Removed from library.");
   }
 
   if (loading) {
@@ -158,26 +128,19 @@ export default function LibraryPage() {
             </h1>
 
             <p className="mt-6 max-w-3xl text-xl text-zinc-400">
-              Your saved chapters and
-              collected stories from the
-              Red-Eye Universe.
+              Your saved chapters and collected stories from the Red-Eye
+              Universe.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-4">
               <div className="rounded-2xl border border-red-900/20 bg-zinc-950/80 px-6 py-4">
-                <div className="text-sm text-zinc-300">
-                  Saved Chapters
-                </div>
+                <div className="text-sm text-zinc-300">Saved Chapters</div>
 
-                <div className="mt-2 text-3xl font-black">
-                  {items.length}
-                </div>
+                <div className="mt-2 text-3xl font-black">{items.length}</div>
               </div>
 
               <div className="rounded-2xl border border-red-900/20 bg-zinc-950/80 px-6 py-4">
-                <div className="text-sm text-zinc-300">
-                  Collection Status
-                </div>
+                <div className="text-sm text-zinc-300">Collection Status</div>
 
                 <div className="mt-2 text-3xl font-black text-red-500">
                   Active
@@ -191,18 +154,12 @@ export default function LibraryPage() {
 
         {items.length === 0 ? (
           <section className="mx-auto flex max-w-4xl flex-col items-center px-6 py-24 text-center">
-            <Sparkles
-              size={80}
-              className="mb-8 text-red-500"
-            />
+            <Sparkles size={80} className="mb-8 text-red-500" />
 
-            <h2 className="text-4xl font-black">
-              Your Library Is Empty
-            </h2>
+            <h2 className="text-4xl font-black">Your Library Is Empty</h2>
 
             <p className="mt-4 max-w-xl text-zinc-300">
-              Save chapters while reading
-              and build your own collection.
+              Save chapters while reading and build your own collection.
             </p>
 
             <Link
@@ -246,16 +203,11 @@ export default function LibraryPage() {
 
                   <div className="p-6">
                     <div className="mb-3 inline-flex rounded-full bg-red-950/30 px-3 py-1 text-sm text-red-400">
-                      Chapter{" "}
-                      {item.chapter
-                        ?.chapter_number ??
-                        "?"}
+                      Chapter {item.chapter?.chapter_number ?? "?"}
                     </div>
 
                     <h2 className="text-xl font-bold">
-                      {item.chapter
-                        ?.title ??
-                        "Unknown Chapter"}
+                      {item.chapter?.title ?? "Unknown Chapter"}
                     </h2>
 
                     <div className="mt-8 flex gap-3">
@@ -277,18 +229,11 @@ export default function LibraryPage() {
                         "
                       >
                         Read
-
-                        <ArrowRight
-                          size={16}
-                        />
+                        <ArrowRight size={16} />
                       </Link>
 
                       <button
-                        onClick={() =>
-                          removeFromLibrary(
-                            item.id
-                          )
-                        }
+                        onClick={() => removeFromLibrary(item.id)}
                         className="
                           rounded-xl
                           border
@@ -298,9 +243,7 @@ export default function LibraryPage() {
                           hover:border-red-500
                         "
                       >
-                        <Trash2
-                          size={18}
-                        />
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </div>
