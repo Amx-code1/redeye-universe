@@ -1,35 +1,32 @@
 import Link from "next/link";
-import {
-  MessageSquare,
-  Plus,
-  TrendingUp,
-} from "lucide-react";
+import { MessageSquare, Plus, TrendingUp } from "lucide-react";
 
 import { supabase } from "@/lib/supabase/client";
 
 export default async function CommunityPage() {
-  const { data: threads } = await supabase
+  const { data: threads, error } = await supabase
     .from("community_threads")
     .select("*")
     .order("created_at", {
       ascending: false,
     });
 
-  const { count: threadCount } =
-    await supabase
-      .from("community_threads")
-      .select("*", {
-        count: "exact",
-        head: true,
-      });
+  console.log("THREADS:", threads);
+  console.log("ERROR:", error);
 
-  const { count: replyCount } =
-    await supabase
-      .from("community_replies")
-      .select("*", {
-        count: "exact",
-        head: true,
-      });
+  const { count: threadCount } = await supabase
+    .from("community_threads")
+    .select("*", {
+      count: "exact",
+      head: true,
+    });
+
+  const { count: replyCount } = await supabase
+    .from("community_replies")
+    .select("*", {
+      count: "exact",
+      head: true,
+    });
 
   const categories = [
     "General",
@@ -56,16 +53,12 @@ export default async function CommunityPage() {
 
               <h1 className="text-5xl font-black md:text-7xl">
                 Discuss The
-                <span className="text-red-500">
-                  {" "}
-                  Universe
-                </span>
+                <span className="text-red-500"> Universe</span>
               </h1>
 
               <p className="mt-6 max-w-2xl text-lg text-zinc-300">
-                Share theories, discuss
-                chapters, explore lore, and
-                connect with other readers.
+                Share theories, discuss chapters, explore lore, and connect with
+                other readers.
               </p>
             </div>
 
@@ -141,9 +134,7 @@ export default async function CommunityPage() {
 
       <section className="mx-auto max-w-7xl px-6 pb-24">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-3xl font-black">
-            Latest Discussions
-          </h2>
+          <h2 className="text-3xl font-black">Latest Discussions</h2>
         </div>
 
         {threads?.length === 0 && (
@@ -157,13 +148,10 @@ export default async function CommunityPage() {
               text-center
             "
           >
-            <h3 className="text-2xl font-bold">
-              No Discussions Yet
-            </h3>
+            <h3 className="text-2xl font-bold">No Discussions Yet</h3>
 
             <p className="mt-4 text-zinc-400">
-              Be the first to create a
-              thread.
+              Be the first to create a thread.
             </p>
 
             <Link
@@ -206,18 +194,14 @@ export default async function CommunityPage() {
                 {thread.category}
               </div>
 
-              <h3 className="text-2xl font-bold">
-                {thread.title}
-              </h3>
+              <h3 className="text-2xl font-bold">{thread.title}</h3>
 
               <p className="mt-3 line-clamp-2 text-zinc-300">
                 {thread.content}
               </p>
 
               <div className="mt-5 text-sm text-zinc-500">
-                {new Date(
-                  thread.created_at
-                ).toLocaleDateString()}
+                {new Date(thread.created_at).toLocaleDateString()}
               </div>
             </Link>
           ))}
@@ -247,17 +231,11 @@ function StatCard({
         backdrop-blur-xl
       "
     >
-      <div className="mb-4 text-red-400">
-        {icon}
-      </div>
+      <div className="mb-4 text-red-400">{icon}</div>
 
-      <div className="text-4xl font-black text-white">
-        {title}
-      </div>
+      <div className="text-4xl font-black text-white">{title}</div>
 
-      <div className="mt-2 text-zinc-300">
-        {subtitle}
-      </div>
+      <div className="mt-2 text-zinc-300">{subtitle}</div>
     </div>
   );
 }
