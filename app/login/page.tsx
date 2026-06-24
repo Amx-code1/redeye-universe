@@ -1,19 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { FaDiscord } from "react-icons/fa";
 
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  MessageSquare,
-} from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+
+const getRedirectUrl = () => {
+  if (typeof window === "undefined") {
+    return process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  }
+
+  return `${window.location.origin}/profile`;
+};
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -26,11 +28,10 @@ export default function LoginPage() {
     try {
       setLoading(true);
 
-      const { error } =
-        await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
       if (error) {
         toast.error(error.message);
@@ -51,55 +52,57 @@ export default function LoginPage() {
     try {
       setLoading(true);
 
-      const { error } =
-        await supabase.auth.signInWithOtp({
-          email,
-          options: {
-            emailRedirectTo:
-              `${process.env.NEXT_PUBLIC_SITE_URL}/profile`,
-          },
-        });
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: getRedirectUrl(),
+        },
+      });
 
       if (error) {
         toast.error(error.message);
         return;
       }
 
-      toast.success(
-        "Magic link sent. Check your inbox."
-      );
+      toast.success("Magic link sent. Check your inbox.");
     } finally {
       setLoading(false);
     }
   }
 
   async function signInWithGoogle() {
-    const { error } =
-      await supabase.auth.signInWithOAuth({
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo:
-            `${process.env.NEXT_PUBLIC_SITE_URL}/profile`,
+          redirectTo: getRedirectUrl(),
         },
       });
 
-    if (error) {
-      toast.error(error.message);
+      if (error) {
+        toast.error(error.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Google login failed");
     }
   }
 
   async function signInWithDiscord() {
-    const { error } =
-      await supabase.auth.signInWithOAuth({
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: "discord",
         options: {
-          redirectTo:
-            `${process.env.NEXT_PUBLIC_SITE_URL}/profile`,
+          redirectTo: getRedirectUrl(),
         },
       });
 
-    if (error) {
-      toast.error(error.message);
+      if (error) {
+        toast.error(error.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Discord login failed");
     }
   }
 
@@ -113,61 +116,39 @@ export default function LoginPage() {
             RED-EYE
           </h1>
 
-          <p className="mt-4 text-zinc-400">
-            Enter the universe.
-          </p>
+          <p className="mt-4 text-zinc-400">Enter the universe.</p>
         </div>
 
         <div className="space-y-4">
           <div className="relative">
-            <Mail
-              size={18}
-              className="absolute left-4 top-4 text-zinc-300"
-            />
+            <Mail size={18} className="absolute left-4 top-4 text-zinc-300" />
 
             <input
               type="email"
               placeholder="Email address"
               value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 py-4 pl-12 pr-4 outline-none transition focus:border-red-500"
             />
           </div>
 
           <div className="relative">
-            <Lock
-              size={18}
-              className="absolute left-4 top-4 text-zinc-300"
-            />
+            <Lock size={18} className="absolute left-4 top-4 text-zinc-300" />
 
             <input
-              type={
-                showPassword
-                  ? "text"
-                  : "password"
-              }
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
               value={password}
-              onChange={(e) =>
-                setPassword(e.target.value)
-              }
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full rounded-2xl border border-zinc-800 bg-zinc-900 py-4 pl-12 pr-12 outline-none transition focus:border-red-500"
             />
 
             <button
               type="button"
-              onClick={() =>
-                setShowPassword(!showPassword)
-              }
+              onClick={() => setShowPassword(!showPassword)}
               className="absolute right-4 top-4"
             >
-              {showPassword ? (
-                <EyeOff size={18} />
-              ) : (
-                <Eye size={18} />
-              )}
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
 
@@ -190,9 +171,7 @@ export default function LoginPage() {
 
         <div className="my-8 flex items-center">
           <div className="h-px flex-1 bg-zinc-800" />
-          <span className="px-4 text-sm text-zinc-300">
-            OR
-          </span>
+          <span className="px-4 text-sm text-zinc-300">OR</span>
           <div className="h-px flex-1 bg-zinc-800" />
         </div>
 
@@ -216,10 +195,7 @@ export default function LoginPage() {
 
         <div className="mt-8 text-center text-sm text-zinc-300">
           No account?{" "}
-          <Link
-            href="/register"
-            className="text-red-400 hover:text-red-300"
-          >
+          <Link href="/register" className="text-red-400 hover:text-red-300">
             Create one
           </Link>
         </div>
