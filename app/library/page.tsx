@@ -2,35 +2,51 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Skeleton from "@/components/ui/Skeleton";
 import toast from "react-hot-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 import { BookOpen, Trash2, Library, Sparkles, ArrowRight } from "lucide-react";
 
+
+type LibraryItem = {
+    id: string;
+    chapter_id: string;
+    chapter?: {
+      id: string;
+      title: string;
+      slug: string;
+      chapter_number: number;
+    };
+  }; 
+
+  
 export default function LibraryPage() {
-  const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const { user, loading: authLoading } = useAuth();
+
+  
+
+  const [items, setItems] = useState<LibraryItem[]>([]);
 
   useEffect(() => {
+    if (authLoading) return;
+
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     loadLibrary();
-  }, []);
+  }, [user, authLoading]);
 
   async function loadLibrary() {
+    if (!user) return;
     try {
       setLoading(true);
-
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      const user = session?.user;
-
-      if (!user) {
-        return;
-      }
 
       const { data: libraryData, error } = await supabase
         .from("library")
@@ -52,10 +68,14 @@ export default function LibraryPage() {
 
       const chapterIds = libraryData.map((item) => item.chapter_id);
 
-      const { data: chapters } = await supabase
+      const { data: chapters, error: chapterError } = await supabase
         .from("chapters")
         .select("id,title,slug,chapter_number")
         .in("id", chapterIds);
+
+      if (chapterError) {
+        throw chapterError;
+      }
 
       const merged = libraryData.map((item) => ({
         ...item,

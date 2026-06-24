@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, MessageSquarePlus } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const categories = [
   "General",
@@ -19,55 +19,51 @@ const categories = [
 
 export default function NewThreadPage() {
   const router = useRouter();
-
+  const { user } = useAuth();
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("General");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(
-    e: React.FormEvent<HTMLFormElement>
-  ) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     try {
       setLoading(true);
 
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError || !user) {
+      if (!user) {
         toast.error("Please login first.");
         router.push("/login");
         return;
       }
 
       if (title.trim().length < 5) {
-        toast.error(
-          "Title must be at least 5 characters."
-        );
+        toast.error("Title must be at least 5 characters.");
         return;
       }
 
       if (content.trim().length < 20) {
-        toast.error(
-          "Content must be at least 20 characters."
-        );
+        toast.error("Content must be at least 20 characters.");
         return;
       }
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("community_threads")
         .insert({
           user_id: user.id,
           title: title.trim(),
           category,
           content: content.trim(),
-        });
+        })
+        .select();
 
-      if (error) throw error;
+      console.log("THREAD DATA", data);
+      console.log("THREAD ERROR", error);
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
 
       toast.success("Thread created successfully!");
 
@@ -76,9 +72,7 @@ export default function NewThreadPage() {
     } catch (error) {
       console.error(error);
 
-      toast.error(
-        "Failed to create thread. Please try again."
-      );
+      toast.error("Failed to create thread. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -143,8 +137,7 @@ export default function NewThreadPage() {
           </h1>
 
           <p className="mt-4 max-w-2xl text-lg text-zinc-300">
-            Share theories, discuss chapters,
-            debate characters, and explore the
+            Share theories, discuss chapters, debate characters, and explore the
             mysteries of the Red-Eye Universe.
           </p>
         </div>
@@ -172,9 +165,7 @@ export default function NewThreadPage() {
             <input
               type="text"
               value={title}
-              onChange={(e) =>
-                setTitle(e.target.value)
-              }
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="Example: Is Viktor Still Alive?"
               className="
                 w-full
@@ -203,9 +194,7 @@ export default function NewThreadPage() {
 
             <select
               value={category}
-              onChange={(e) =>
-                setCategory(e.target.value)
-              }
+              onChange={(e) => setCategory(e.target.value)}
               className="
                 w-full
                 rounded-2xl
@@ -220,10 +209,7 @@ export default function NewThreadPage() {
               "
             >
               {categories.map((item) => (
-                <option
-                  key={item}
-                  value={item}
-                >
+                <option key={item} value={item}>
                   {item}
                 </option>
               ))}
@@ -239,9 +225,7 @@ export default function NewThreadPage() {
 
             <textarea
               value={content}
-              onChange={(e) =>
-                setContent(e.target.value)
-              }
+              onChange={(e) => setContent(e.target.value)}
               rows={12}
               placeholder="Share your thoughts..."
               className="
@@ -280,9 +264,7 @@ export default function NewThreadPage() {
                 disabled:opacity-50
               "
             >
-              {loading
-                ? "Creating Thread..."
-                : "Create Thread"}
+              {loading ? "Creating Thread..." : "Create Thread"}
             </button>
 
             <Link

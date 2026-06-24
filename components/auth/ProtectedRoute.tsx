@@ -1,54 +1,51 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { useRouter } from "next/navigation";
+import {
+  useEffect,
+} from "react";
+
+import {
+  useRouter,
+} from "next/navigation";
+
+import {
+  useAuth,
+} from "@/contexts/AuthContext";
 
 export default function ProtectedRoute({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const {
+    user,
+    loading,
+  } = useAuth();
+
   const router = useRouter();
 
-  const [loading, setLoading] = useState(true);
-  const [authorized, setAuthorized] = useState(false);
-
   useEffect(() => {
-    checkUser();
-  }, []);
-
-  async function checkUser() {
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        router.replace("/login");
-        return;
-      }
-
-      setAuthorized(true);
-    } catch (error) {
-      console.error(error);
-      router.replace("/login");
-    } finally {
-      setLoading(false);
+    if (
+      !loading &&
+      !user
+    ) {
+      router.push("/login");
     }
-  }
+  }, [
+    user,
+    loading,
+    router,
+  ]);
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-black p-10 text-white">
+      <div className="flex min-h-screen items-center justify-center bg-black text-white">
         Loading...
-      </main>
+      </div>
     );
   }
 
-  if (!authorized) {
-    return null;
-  }
+  if (!user) return null;
 
   return <>{children}</>;
 }

@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import AvatarUpload from "@/components/profile/AvatarUpload";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import toast from "react-hot-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Profile = {
   id: string;
@@ -22,18 +23,22 @@ export default function SettingsPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    loadProfile();
-  }, []);
+    if (authLoading) return;
 
-  async function loadProfile() {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    loadProfile(user.id);
+  }, [user, authLoading]);
+
+  async function loadProfile(userId: string) {
     try {
-      const {
-  data: { session },
-} = await supabase.auth.getSession();
-
-const user = session?.user;
+      
 
       if (!user) {
         setLoading(false);
@@ -43,7 +48,7 @@ const user = session?.user;
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .single();
 
       if (error) {
@@ -79,9 +84,7 @@ const user = session?.user;
 
       const {
         data: { publicUrl },
-      } = supabase.storage
-        .from("avatars")
-        .getPublicUrl(fileName);
+      } = supabase.storage.from("avatars").getPublicUrl(fileName);
 
       setProfile({
         ...profile,
@@ -94,9 +97,7 @@ const user = session?.user;
     }
   }
 
-  async function handleBannerUpload(
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
+  async function handleBannerUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
 
     if (!file || !profile) return;
@@ -116,9 +117,7 @@ const user = session?.user;
 
       const {
         data: { publicUrl },
-      } = supabase.storage
-        .from("banners")
-        .getPublicUrl(fileName);
+      } = supabase.storage.from("banners").getPublicUrl(fileName);
 
       setProfile({
         ...profile,
@@ -137,12 +136,7 @@ const user = session?.user;
     setSaving(true);
 
     try {
-      const {
-  data: { session },
-} = await supabase.auth.getSession();
-
-const user = session?.user;
-
+     
       if (!user) {
         toast.error("Not authenticated");
         return;
@@ -175,41 +169,28 @@ const user = session?.user;
   }
 
   async function resetPassword() {
-    const {
-  data: { session },
-} = await supabase.auth.getSession();
-
-const user = session?.user;
+    
 
     if (!user?.email) {
       toast.error("Email not found");
       return;
     }
 
-    const { error } =
-      await supabase.auth.resetPasswordForEmail(
-        user.email,
-        {
-          redirectTo:
-            `${window.location.origin}/reset-password`,
-        }
-      );
+    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
 
     if (error) {
       toast.error(error.message);
       return;
     }
 
-    toast.success(
-      "Password reset email sent"
-    );
+    toast.success("Password reset email sent");
   }
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-black text-white p-10">
-        Loading...
-      </main>
+      <main className="min-h-screen bg-black text-white p-10">Loading...</main>
     );
   }
 
@@ -250,7 +231,6 @@ const user = session?.user;
 
           <label className="absolute bottom-4 right-4 cursor-pointer rounded-xl bg-red-600 px-5 py-3 font-semibold hover:bg-red-700">
             Upload Banner
-
             <input
               hidden
               type="file"
@@ -261,9 +241,7 @@ const user = session?.user;
         </div>
 
         <div className="mx-auto max-w-5xl p-8">
-          <h1 className="mb-8 text-5xl font-bold text-red-500">
-            Settings
-          </h1>
+          <h1 className="mb-8 text-5xl font-bold text-red-500">Settings</h1>
 
           <AvatarUpload
             avatarUrl={profile.avatar_url || ""}
@@ -301,8 +279,7 @@ const user = session?.user;
               onChange={(e) =>
                 setProfile({
                   ...profile,
-                  age:
-                    Number(e.target.value) || null,
+                  age: Number(e.target.value) || null,
                 })
               }
               placeholder="Age"
@@ -319,18 +296,10 @@ const user = session?.user;
               }
               className="rounded-xl bg-zinc-900 p-4"
             >
-              <option value="">
-                Select Gender
-              </option>
-              <option value="Male">
-                Male
-              </option>
-              <option value="Female">
-                Female
-              </option>
-              <option value="Other">
-                Other
-              </option>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
             </select>
           </div>
 
@@ -353,9 +322,7 @@ const user = session?.user;
           </div>
 
           <div className="mt-8 rounded-2xl bg-zinc-900 p-6">
-            <h3 className="mb-4 text-xl font-semibold">
-              Profile Completion
-            </h3>
+            <h3 className="mb-4 text-xl font-semibold">Profile Completion</h3>
 
             <div className="h-3 overflow-hidden rounded-full bg-zinc-800">
               <div
@@ -367,8 +334,7 @@ const user = session?.user;
             </div>
 
             <p className="mt-3 text-zinc-400">
-              {Math.round(completion)}%
-              Complete
+              {Math.round(completion)}% Complete
             </p>
           </div>
 
@@ -378,9 +344,7 @@ const user = session?.user;
               disabled={saving}
               className="rounded-xl bg-red-600 px-8 py-4 font-semibold hover:bg-red-700 disabled:opacity-50"
             >
-              {saving
-                ? "Saving..."
-                : "Save Changes"}
+              {saving ? "Saving..." : "Save Changes"}
             </button>
 
             <button

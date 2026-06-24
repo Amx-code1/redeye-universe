@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-
+import { useAuth } from "@/contexts/AuthContext";
 import ProfileCompletion from "@/components/profile/ProfileCompletion";
 import ReaderStats from "@/components/profile/ReaderStats";
 import ContinueReading from "@/components/profile/ContinueReading";
@@ -36,33 +36,33 @@ type Profile = {
 export default function ProfilePage() {
   const router = useRouter();
   const [profile, setProfile] = useState<Profile | null>(null);
-
+  const [loading, setLoading] = useState(true);
   const [commentsCount, setCommentsCount] = useState(0);
   const [savedCount, setSavedCount] = useState(0);
-
+  const { user, loading: authLoading } = useAuth();
   const [progressData, setProgressData] = useState<any[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    loadProfile();
-  }, []);
-
-  async function loadProfile() {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    const user = session?.user;
+    if (authLoading) return;
 
     if (!user) {
-      router.push("/login");
+      setLoading(false);
       return;
     }
+
+    loadProfile(user.id);
+  }, [user, authLoading]);
+
+  async function loadProfile(currentUserId: string) {
+    if (!user) return;
+
+    const userId = user.id;
 
     const { data: profileData } = await supabase
       .from("profiles")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_id", currentUserId)
       .single();
 
     if (!profileData) {
@@ -87,43 +87,6 @@ export default function ProfilePage() {
     } else {
       setProfile(profileData);
     }
-
-    setProfile(profileData);
-
-    // const { data: comments } = await supabase
-    //   .from("comments")
-    //   .select("id")
-    //   .eq("user_id", user.id);
-
-    // setCommentsCount(comments?.length || 0);
-
-    // const { count } = await supabase
-    //   .from("library")
-    //   .select("*", {
-    //     count: "exact",
-    //     head: true,
-    //   })
-    //   .eq("user_id", user.id);
-
-    // setSavedCount(count || 0);
-
-    // const { data: progress } = await supabase
-    //   .from("reading_progress")
-    //   .select(
-    //     `
-    //       *,
-    //       chapters (
-    //         title,
-    //         slug
-    //       )
-    //     `,
-    //   )
-    //   .eq("user_id", user.id)
-    //   .order("updated_at", {
-    //     ascending: false,
-    //   });
-
-    // setProgressData(progress || []);
 
     const [commentsResult, libraryResult, progressResult] = await Promise.all([
       supabase.from("comments").select("id").eq("user_id", user.id),

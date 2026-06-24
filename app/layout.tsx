@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Cinzel } from "next/font/google";
 import AdScript from "@/components/ads/AdScript";
 import "./globals.css";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -19,8 +20,6 @@ const cinzel = Cinzel({
   variable: "--font-cinzel",
   display: "swap",
 });
-
-
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://redeye-universe.vercel.app"),
@@ -62,7 +61,7 @@ export const metadata: Metadata = {
     description:
       "Explore the dark fantasy world of Agastha Crystals and forbidden power.",
     images: ["/og-image.jpg"],
-    },
+  },
 
   robots: {
     index: true,
@@ -82,27 +81,27 @@ export default function RootLayout({
       className={`${inter.variable} ${cinzel.variable}`}
     >
       <body className="flex min-h-screen flex-col bg-black text-white antialiased">
-        <Navbar />
+        <AuthProvider>
+          <Navbar />
 
-        <main className="flex-1 ">
-          {children}
-        </main>
+          <main className="flex-1 ">{children}</main>
 
-        <Footer />
-        <AdScript />
+          <Footer />
+          <AdScript />
 
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: "#18181b",
-              color: "#fff",
-              border: "1px solid rgba(239,68,68,0.3)",
-            },
-          }}
-        />
-        <Analytics />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: "#18181b",
+                color: "#fff",
+                border: "1px solid rgba(239,68,68,0.3)",
+              },
+            }}
+          />
+          <Analytics />
+        </AuthProvider>
       </body>
     </html>
   );
