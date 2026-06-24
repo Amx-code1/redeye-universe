@@ -8,10 +8,14 @@ import ThreadCard from "./ThreadCard";
 
 type Thread = {
   id: string;
+  user_id: string;
   title: string;
   content: string;
   category: string;
   created_at: string;
+
+  author?: string;
+  reply_count?: number;
 };
 
 export default function ThreadList({
@@ -22,6 +26,7 @@ export default function ThreadList({
   selectedCategory: string;
 }) {
   const [threads, setThreads] = useState<Thread[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string>();
 
   const [loading, setLoading] = useState(true);
 
@@ -38,9 +43,10 @@ export default function ThreadList({
   }, [threads]);
 
   useEffect(() => {
+    loadCurrentUser();
     loadThreads();
 
-    const interval = setInterval(loadThreads, 15000);
+    const interval = setInterval(loadThreads, 30000);
 
     const channel = supabase
       .channel("community-threads")
@@ -63,13 +69,28 @@ export default function ThreadList({
     };
   }, []);
 
+  async function loadCurrentUser() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    setCurrentUserId(user?.id);
+  }
+
   async function loadThreads() {
     try {
       setLoading(true);
 
       const { data, error } = await supabase
         .from("community_threads")
-        .select("*")
+        .select(
+          `
+    *,
+    profiles:user_id (
+      username
+    )
+  `,
+        )
         .order("created_at", {
           ascending: false,
         });
@@ -79,7 +100,12 @@ export default function ThreadList({
         return;
       }
 
-      setThreads(data || []);
+      const enriched = (data || []).map((thread: any) => ({
+        ...thread,
+        author: thread.profiles?.username ?? "reader",
+      }));
+
+      setThreads(enriched);
     } catch (err) {
       console.error(err);
     } finally {
@@ -122,10 +148,19 @@ export default function ThreadList({
     );
   }
 
+  function handleDelete(id: string) {
+    setThreads((prev) => prev.filter((thread) => thread.id !== id));
+  }
+
   return (
     <div className="grid gap-5">
       {filteredThreads.map((thread) => (
-        <ThreadCard key={thread.id} thread={thread} />
+        <ThreadCard
+          key={thread.id}
+          thread={thread}
+          currentUserId={currentUserId}
+          onDelete={handleDelete}
+        />
       ))}
     </div>
   );

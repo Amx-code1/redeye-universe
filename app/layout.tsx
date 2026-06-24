@@ -3,7 +3,7 @@ import { Inter, Cinzel } from "next/font/google";
 import AdScript from "@/components/ads/AdScript";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
-
+import CommandPalette from "@/components/navbar/CommandPalette";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Analytics } from "@vercel/analytics/react";
@@ -82,6 +82,7 @@ export default function RootLayout({
     >
       <body className="flex min-h-screen flex-col bg-black text-white antialiased">
         <AuthProvider>
+          <CommandPalette />
           <Navbar />
 
           <main className="flex-1 ">{children}</main>
