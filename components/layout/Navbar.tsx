@@ -5,17 +5,17 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, Search, LogOut } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import Image from "next/image";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
-
+  const { user, loading } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
 
   type Profile = {
     username: string | null;
@@ -26,22 +26,25 @@ export default function Navbar() {
   const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
-    loadUser();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_, session) => {
-      setUser(session?.user ?? null);
-
-      if (session?.user) {
-        await loadUser();
-      } else {
+    async function loadProfile() {
+      if (!user) {
         setProfile(null);
+        return;
       }
-    });
 
-    return () => subscription.unsubscribe();
-  }, []);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("username, avatar_url, role")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!error) {
+        setProfile(data);
+      }
+    }
+
+    loadProfile();
+  }, [user]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,31 +56,15 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  async function loadUser() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    setUser(user);
-
-    if (!user) return;
-
-    const { data } = await supabase
-      .from("profiles")
-      .select("username, avatar_url, role")
-      .eq("user_id", user.id)
-      .single();
-
-    setProfile(data);
-  }
-
   async function logout() {
     await supabase.auth.signOut();
 
     setProfile(null);
-    setUser(null);
 
     router.push("/");
+  }
+  if (loading) {
+    return null;
   }
 
   return (

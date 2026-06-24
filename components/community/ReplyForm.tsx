@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { useAuth } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 
 export default function ReplyForm({
   threadId,
@@ -13,7 +13,7 @@ export default function ReplyForm({
   threadId: string;
 }) {
   const router = useRouter();
-
+  const { user } = useAuth();
   const [content, setContent] =
     useState("");
 
@@ -27,11 +27,6 @@ export default function ReplyForm({
 
     try {
       setLoading(true);
-
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
       if (!user) {
         toast.error(
           "Please login first."

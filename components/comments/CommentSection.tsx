@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Comment {
   id: string;
@@ -18,25 +19,24 @@ interface Comment {
 }
 
 export default function CommentSection({ chapterId }: { chapterId: string }) {
-  const [comments, setComments] = useState<Comment[]>([]);
+  const [comments, setComments] =
+  useState<Comment[]>([]);
   const [content, setContent] = useState("");
-  const [user, setUser] = useState<any>(null);
+  const { user, loading: authLoading } = useAuth();
   const [commentCount, setCommentCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     loadComments();
-    loadUser();
   }, [chapterId]);
 
-  async function loadUser() {
-    const {
-  data: { session },
-} = await supabase.auth.getSession();
+  if (authLoading) {
+    return;
+  }
 
-const user = session?.user;
-
-    setUser(user);
+  if (!user) {
+    toast.error("Please login first");
+    return;
   }
 
   async function loadComments() {
@@ -157,7 +157,9 @@ const user = session?.user;
                 </div>
 
                 <div>
-                  <p className="font-bold text-red-400">@{comment.profiles?.username || "reader"}</p>
+                  <p className="font-bold text-red-400">
+                    @{comment.profiles?.username || "reader"}
+                  </p>
 
                   <p className="text-xs text-zinc-300">
                     {new Date(comment.created_at).toLocaleString()}

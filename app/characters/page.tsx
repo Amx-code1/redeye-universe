@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import CharacterCard from "@/components/character/CharacterCard";
 import type { Metadata } from "next";
 import { Users, Crown, ShieldAlert } from "lucide-react";

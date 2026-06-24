@@ -1,41 +1,59 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase/client";
 
 export function useProfile() {
-  const [profile, setProfile] = useState(null);
+  const { user, loading: authLoading } = useAuth();
+
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadProfile();
-  }, []);
-
-  async function loadProfile() {
-    const {
-  data: { session },
-} = await supabase.auth.getSession();
-
-const user = session?.user;
+    if (authLoading) return;
 
     if (!user) {
+      setProfile(null);
       setLoading(false);
       return;
     }
 
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", user.id)
-      .single();
+    loadProfile(user.id);
+  }, [user, authLoading]);
 
-    setProfile(data);
-    setLoading(false);
+  async function loadProfile(userId: string) {
+    try {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", userId)
+        .single();
+
+      if (error) {
+        console.error(error);
+        setProfile(null);
+        return;
+      }
+
+      setProfile(data);
+    } catch (error) {
+      console.error(error);
+      setProfile(null);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return {
     profile,
     loading,
-    reload: loadProfile,
+    reload: () => {
+      if (user) {
+        loadProfile(user.id);
+      }
+    },
   };
 }

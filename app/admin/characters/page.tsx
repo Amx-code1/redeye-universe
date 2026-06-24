@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
 import {
   Plus,

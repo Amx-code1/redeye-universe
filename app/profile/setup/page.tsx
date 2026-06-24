@@ -1,34 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import toast from "react-hot-toast";
-
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function ProfileSetup() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
+  const { user, loading: authLoading } = useAuth();
 
   async function saveProfile() {
-    const {
-  data: { session },
-} = await supabase.auth.getSession();
+    if (authLoading) return;
 
-const user = session?.user;
+    if (!user) {
+      toast.error("Please login first");
+      return;
+    }
 
-    if (!user) return;
-
-    const { error } = await supabase
-      .from("profiles")
-      .insert({
-        user_id: user.id,
-        full_name: name,
-        username,
-        age: Number(age),
-        gender,
-      });
+    const { error } = await supabase.from("profiles").insert({
+      user_id: user.id,
+      full_name: name,
+      username,
+      age: Number(age),
+      gender,
+    });
 
     if (error) {
       toast.error(error.message);
@@ -36,14 +34,13 @@ const user = session?.user;
     }
 
     toast.success("Profile created!");
+
     window.location.href = "/profile";
   }
 
   return (
     <main className="min-h-screen bg-black p-10 text-white">
-      <h1 className="mb-8 text-5xl font-bold text-red-500">
-        Complete Profile
-      </h1>
+      <h1 className="mb-8 text-5xl font-bold text-red-500">Complete Profile</h1>
 
       <div className="space-y-4 max-w-xl">
         <input
@@ -56,9 +53,7 @@ const user = session?.user;
         <input
           placeholder="Username"
           value={username}
-          onChange={(e) =>
-            setUsername(e.target.value)
-          }
+          onChange={(e) => setUsername(e.target.value)}
           className="w-full rounded-xl bg-zinc-900 p-4"
         />
 
@@ -71,14 +66,10 @@ const user = session?.user;
 
         <select
           value={gender}
-          onChange={(e) =>
-            setGender(e.target.value)
-          }
+          onChange={(e) => setGender(e.target.value)}
           className="w-full rounded-xl bg-zinc-900 p-4"
         >
-          <option value="">
-            Select Gender
-          </option>
+          <option value="">Select Gender</option>
 
           <option>Male</option>
           <option>Female</option>

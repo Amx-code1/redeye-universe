@@ -30,8 +30,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function init() {
       try {
-        console.log("[AUTH] Initializing...");
-
         const timeout = new Promise((_, reject) =>
           setTimeout(() => reject(new Error("Auth timeout")), 8000),
         );
@@ -47,13 +45,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         const session = result.data.session;
 
-        console.log("[AUTH] Session:", session);
-
         setSession(session);
         setUser(session?.user ?? null);
       } catch (err) {
-        console.error("[AUTH ERROR]", err);
-
         setSession(null);
         setUser(null);
       } finally {

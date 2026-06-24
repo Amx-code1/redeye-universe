@@ -6,7 +6,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 
 import ReplyForm from "@/components/community/ReplyForm";
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import AdminRoute from "@/components/auth/AdminRoute";
 import toast from "react-hot-toast";
 

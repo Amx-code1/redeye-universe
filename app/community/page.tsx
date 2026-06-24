@@ -5,7 +5,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 
 export default async function CommunityPage() {
   const { data: threads } = await supabase

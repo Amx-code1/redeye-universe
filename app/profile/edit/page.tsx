@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase/client";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import AvatarUpload from "@/components/profile/AvatarUpload";
 import toast from "react-hot-toast";
@@ -13,6 +13,7 @@ import {
   VenusAndMars,
   FileText,
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Profile {
   id: string;
@@ -28,32 +29,28 @@ interface Profile {
 
 export default function EditProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
-
+  const { user, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingBanner, setUploadingBanner] = useState(false);
 
   useEffect(() => {
-    loadProfile();
-  }, []);
+    if (authLoading) return;
 
-  async function loadProfile() {
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+
+    loadProfile(user.id);
+  }, [user, authLoading]);
+
+  async function loadProfile(userId: string) {
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      const user = session?.user;
-
-      if (!user) {
-        window.location.href = "/login";
-        return;
-      }
-
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .single();
 
       if (error) {
@@ -68,7 +65,6 @@ export default function EditProfilePage() {
       setLoading(false);
     }
   }
-
   async function handleAvatarUpload(file: File) {
     if (!profile) return;
 
