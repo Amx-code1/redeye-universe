@@ -83,14 +83,7 @@ export default function ThreadList({
 
       const { data, error } = await supabase
         .from("community_threads")
-        .select(
-          `
-    *,
-    profiles:user_id (
-      username
-    )
-  `,
-        )
+        .select("*")
         .order("created_at", {
           ascending: false,
         });
